@@ -1,0 +1,5 @@
+package play
+
+class GameSpec {
+
+}
