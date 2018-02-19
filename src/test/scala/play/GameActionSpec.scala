@@ -129,6 +129,28 @@ class GameActionSpec extends FlatSpec {
     assert(action.isValid(playerArea, opponentArea) == false)
   }
 
+  "Resolve dices with cost" should "remove resources from the player" in {
+    val action = ResolveDices(Player.Player1, Seq(2, 3), Seq.empty)
+
+    val playerArea = new PlayerArea(
+      Player.Player1,
+      Array(new InPlayCharacter(
+        1,
+        Awakenings._1,
+        Array(
+          FakeData.diceOneSide(2, DiceSideSymbol.Disrupt, cost = 1, inPool = true),
+          FakeData.diceOneSide(3, DiceSideSymbol.Disrupt, cost = 2, inPool = true)))),
+      new Deck(Seq.empty))
+    playerArea.resources = 4
+
+    val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
+
+    assert(action.isValid(playerArea, opponentArea) == true)
+    action.process(playerArea, opponentArea)
+
+    assert(playerArea.resources == 1)
+  }
+
   "Resolve a resource dice" should "add resource to the player" in {
     val action = ResolveDices(Player.Player1, Seq(2), Seq.empty)
 
@@ -144,7 +166,6 @@ class GameActionSpec extends FlatSpec {
     val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
 
     assert(action.isValid(playerArea, opponentArea) == true)
-
     action.process(playerArea, opponentArea)
 
     assert(playerArea.resources == 4)
