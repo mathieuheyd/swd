@@ -2,14 +2,30 @@ package play
 
 import entities.{Card, Character, Dice, DiceSide}
 
-class InPlayCharacter(val uniqueId: Int, val character: Character, val dices: Array[InPlayDice]) {}
+class InPlayCharacter(val uniqueId: Int, val character: Character, val dices: Array[InPlayDice]) {
+  var isActivated = false
+  var health = character.maxHealth
+  var shields = 0
+}
 
 class InPlayDice(val uniqueId: Int, val dice: Dice) {
 
-  def roll() = {}
+  var sideId = 1
+  var inPool = false
+
+  def roll() = {
+    sideId = scala.util.Random.nextInt(6) + 1
+  }
 
   def currentSide: DiceSide = {
-    dice.side1
+    sideId match {
+      case 1 => dice.side1
+      case 2 => dice.side2
+      case 3 => dice.side3
+      case 4 => dice.side4
+      case 5 => dice.side5
+      case 6 => dice.side6
+    }
   }
 
 }
@@ -32,9 +48,11 @@ class Deck(var cards: Seq[InPlayCard]) {
 
 class DiscardPile(val cards: Array[Card]) {}
 
-class PlayerArea(val characters: Array[InPlayCharacter], val deck: Deck) {
+class PlayerArea(val player: Player.Value, val characters: Array[InPlayCharacter], val deck: Deck) {
 
+  var resources = 0
   var hand: Seq[InPlayCard] = Seq.empty
+  var discardPile: Seq[InPlayCard] = Seq.empty
 
   def shuffleDeck() = deck.shuffle()
 
@@ -50,6 +68,10 @@ class PlayerArea(val characters: Array[InPlayCharacter], val deck: Deck) {
     hand = hand ++ cards
   }
 
+  def putCardInDiscardPile(card: InPlayCard) = {
+    discardPile = discardPile :+ card
+  }
+
   def getCardInHand(uniqueId: Int): Option[InPlayCard] = {
     hand.find(c => c.uniqueId == uniqueId)
   }
@@ -60,8 +82,19 @@ class PlayerArea(val characters: Array[InPlayCharacter], val deck: Deck) {
     card
   }
 
+  def getRandomCardFromHand(): Option[InPlayCard] = {
+    if (hand.size > 0) {
+      Some(hand(scala.util.Random.nextInt(hand.size)))
+    } else
+      None
+  }
+
   def getCharacterOrSupport(uniqueId: Int): Option[InPlayCharacter] = {
     characters.find(c => c.uniqueId == uniqueId)
+  }
+
+  def getDice(uniqueId: Int): Option[InPlayDice] = {
+    characters.flatMap(c => c.dices).find(d => d.uniqueId == uniqueId)
   }
 
 }

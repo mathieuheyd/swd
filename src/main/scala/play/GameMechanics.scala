@@ -2,6 +2,7 @@ package play
 
 import entities.FullDeck
 import play.GamePhase.GamePhase
+import play.history.{HistoryRound, HistoryTurn}
 
 object Player extends Enumeration {
   type Player = Value
@@ -32,16 +33,13 @@ class GameMechanics(deckPlayer1: FullDeck, deckPlayer2: FullDeck) {
 
   var phase: GamePhase = GamePhase.Setup
   var currentPlayer: Player.Value = Player.Player1
-  var eventsHistory: Seq[GameEvent] = Seq.empty
 
-  val areaPlayer1: PlayerArea = initPlayerArea(deckPlayer1, 100)
-  val areaPlayer2: PlayerArea = initPlayerArea(deckPlayer2, 200)
+  val areaPlayer1: PlayerArea = initPlayerArea(Player.Player1, deckPlayer1, 100)
+  val areaPlayer2: PlayerArea = initPlayerArea(Player.Player2, deckPlayer2, 200)
 
-  def addEvent(event: GameEvent) = {
-    eventsHistory = eventsHistory :+ event
-  }
+  var currentRoundHistory = HistoryRound(Seq.empty)
 
-  def initPlayerArea(deck: FullDeck, startId: Int): PlayerArea = {
+  def initPlayerArea(player: Player.Value, deck: FullDeck, startId: Int): PlayerArea = {
     val inPlayCharacters = deck.characters.zipWithIndex.map { c =>
       val uniqueId = startId + c._2 * 3
       val firstDice = new InPlayDice(uniqueId + 1, c._1.character.dice.get)
@@ -53,7 +51,7 @@ class GameMechanics(deckPlayer1: FullDeck, deckPlayer2: FullDeck) {
       val dice = c._1.dice.map { d => new InPlayDice(uniqueId = 1, d) }
       InPlayCard(uniqueId, c._1, dice)
     }
-    new PlayerArea(inPlayCharacters, new Deck(cardsWithId))
+    new PlayerArea(player, inPlayCharacters, new Deck(cardsWithId))
   }
 
   def drawStartingHands() = {
@@ -62,28 +60,28 @@ class GameMechanics(deckPlayer1: FullDeck, deckPlayer2: FullDeck) {
 
     val cardsPlayer1 = areaPlayer1.drawCards(5)
     areaPlayer1.putCardsInHand(cardsPlayer1)
-    addEvent(DrawEvent(Player.Player1, cardsPlayer1.map(_.uniqueId)))
+    //addEvent(DrawEvent(Player.Player1, cardsPlayer1.map(_.uniqueId)))
 
     val cardsPlayer2 = areaPlayer2.drawCards(5)
     areaPlayer2.putCardsInHand(cardsPlayer2)
-    addEvent(DrawEvent(Player.Player2, cardsPlayer2.map(_.uniqueId)))
+    //addEvent(DrawEvent(Player.Player2, cardsPlayer2.map(_.uniqueId)))
 
     phase = GamePhase.Mulligan
   }
 
   def handleAction(player: Player.Value, action: GameAction) = {
     val (playerArea, opponentArea) = if (player == Player.Player1) (areaPlayer1, areaPlayer2) else (areaPlayer2, areaPlayer1)
-    if (action.isValid(phase, playerArea, opponentArea)) {
-      val events = action.process(player, playerArea, opponentArea)
-      eventsHistory = eventsHistory ++ events
+    if (action.isValid(playerArea, opponentArea)) {
+      val event = action.process(playerArea, opponentArea)
+      currentRoundHistory = HistoryRound(currentRoundHistory.turns :+ HistoryTurn(Seq(event)))
     }
 
     // Post action
     phase match {
       case GamePhase.Mulligan => {
-        if (eventsHistory.count(event => event.isInstanceOf[MulliganEvent]) == 2) {
-          phase = GamePhase.Battlefield
-        }
+        //if (eventsHistory.count(event => event.isInstanceOf[MulliganEvent]) == 2) {
+        //  phase = GamePhase.Battlefield
+        //}
       }
       case GamePhase.Battlefield => None
       case GamePhase.Action => None
