@@ -2,7 +2,7 @@ package play
 
 import entities.FullDeck
 import play.GamePhase.GamePhase
-import play.history.{HistoryRound, HistoryTurn}
+import play.history._
 
 object Player extends Enumeration {
   type Player = Value
@@ -102,19 +102,26 @@ class GameMechanics(deckPlayer1: FullDeck, deckPlayer2: FullDeck) {
     if (sum1 > sum2) Player.Player1 else Player.Player2
   }
 
-  def selectBattlefield(playerBattlefield: Player.Value) = {
-
-  }
-
-  def addShields(character1: Int, character2: Int, character3: Int) = {
-
-  }
-
   def startNewRound() = {
-    //areaPlayer1.gainResources(2)
-    //areaPlayer2.gainResources(2)
+    areaPlayer1.characters.foreach(character => {
+      if (character.health > 0 && character.isActivated) {
+        character.isActivated = false
+        CharacterReadiedEffect(character.uniqueId)
 
+        character.dices.map(dice => {
+          if (dice.inPool) {
+            dice.inPool = false
+            DiceOutPoolEffect(dice.uniqueId)
+          }
+        })
+      }
+    })
 
+    areaPlayer1.resources += 2
+    ResourceAddedEffect(Player.Player1, 2)
+
+    areaPlayer2.resources += 2
+    ResourceAddedEffect(Player.Player2, 2)
   }
 
 }

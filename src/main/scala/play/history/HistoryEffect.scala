@@ -5,6 +5,7 @@ import play.Player
 trait HistoryEffect {}
 
 case class CharacterActivatedEffect(uniqueId: Int) extends HistoryEffect
+case class CharacterReadiedEffect(uniqueId: Int) extends HistoryEffect
 case class DiceRolledEffect(uniqueId: Int, sideId: Int) extends HistoryEffect
 case class DiceInPoolEffect(uniqueId: Int) extends HistoryEffect
 case class DiceOutPoolEffect(uniqueId: Int) extends HistoryEffect
