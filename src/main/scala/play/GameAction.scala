@@ -31,14 +31,14 @@ trait GameAction {
 //  }
 //}
 
-//case class PassAction() extends GameAction {
-//  override def isValid(phase: GamePhase.Value, playerArea: PlayerArea, opponentArea: PlayerArea): Boolean = {
-//    true
-//  }
-//  override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea): Seq[GameEvent] = {
-//    Seq(PassEvent(player))
-//  }
-//}
+case class PassAction(player: Player.Value) extends GameAction {
+  override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea): Boolean = {
+    true
+  }
+  override def process(playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent = {
+    HistoryEvent(this, Seq.empty)
+  }
+}
 
 case class ActivateAction(player: Player.Value, card: Int) extends GameAction {
   override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea): Boolean = {
@@ -184,12 +184,12 @@ case class DiscardReroll(player: Player.Value, card: Int, dice: Int) extends Gam
 //    Seq(PassEvent(player))
 //  }
 //}
-//
-//case class ClaimBattlefield() extends GameAction {
-//  override def isValid(phase: GamePhase.Value, playerArea: PlayerArea, opponentArea: PlayerArea): Boolean = {
-//    true
-//  }
-//  override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea): Seq[GameEvent] = {
-//    Seq(PassEvent(player))
-//  }
-//}
+
+case class ClaimBattlefield(player: Player.Value) extends GameAction {
+  override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea): Boolean = {
+    true
+  }
+  override def process(playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent = {
+    HistoryEvent(this, Seq.empty)
+  }
+}
