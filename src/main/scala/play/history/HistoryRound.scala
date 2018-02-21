@@ -1,3 +1,5 @@
 package play.history
 
-case class HistoryRound(val turns: Seq[HistoryTurn]) {}
+case class HistoryRound(actions: Seq[HistoryTurn],
+                        upkeep: Seq[HistoryEffect],
+                        mulligans: Seq[HistoryEvent])

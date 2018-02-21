@@ -4,6 +4,8 @@ import entities.FullDeck
 import play.GamePhase.GamePhase
 import play.history._
 
+import scala.collection.mutable
+
 object Player extends Enumeration {
   type Player = Value
   val Player1, Player2 = Value
@@ -26,7 +28,7 @@ object Player extends Enumeration {
 //  - Actions until both players pass
 object GamePhase extends Enumeration {
   type GamePhase = Value
-  val Setup, Mulligan, Battlefield, Action = Value
+  val Setup, Mulligan, Battlefield, Action, Upkeep = Value
 }
 
 class GameMechanics(deckPlayer1: FullDeck, deckPlayer2: FullDeck) {
@@ -37,7 +39,7 @@ class GameMechanics(deckPlayer1: FullDeck, deckPlayer2: FullDeck) {
   val areaPlayer1: PlayerArea = initPlayerArea(Player.Player1, deckPlayer1, 100)
   val areaPlayer2: PlayerArea = initPlayerArea(Player.Player2, deckPlayer2, 200)
 
-  var currentRoundHistory = HistoryRound(Seq.empty)
+  var currentRoundHistory = HistoryRound(Seq.empty, Seq.empty, Seq.empty)
 
   def initPlayerArea(player: Player.Value, deck: FullDeck, startId: Int): PlayerArea = {
     val inPlayCharacters = deck.characters.zipWithIndex.map { c =>
@@ -73,7 +75,7 @@ class GameMechanics(deckPlayer1: FullDeck, deckPlayer2: FullDeck) {
     val (playerArea, opponentArea) = if (player == Player.Player1) (areaPlayer1, areaPlayer2) else (areaPlayer2, areaPlayer1)
     if (action.isValid(playerArea, opponentArea)) {
       val event = action.process(playerArea, opponentArea)
-      currentRoundHistory = HistoryRound(currentRoundHistory.turns :+ HistoryTurn(Seq(event)))
+      currentRoundHistory = HistoryRound(currentRoundHistory.actions :+ HistoryTurn(Seq(event)), Seq.empty, Seq.empty)
     }
 
     // Post action
@@ -84,7 +86,18 @@ class GameMechanics(deckPlayer1: FullDeck, deckPlayer2: FullDeck) {
         //}
       }
       case GamePhase.Battlefield => None
-      case GamePhase.Action => None
+      case GamePhase.Action => {
+        val bothPlayersPass = currentRoundHistory.actions
+          .takeRight(2)
+          .forall(turn => turn.events.headOption.map(_.action) match {
+            case Some(PassAction(_)) => true
+            case _ => false
+          })
+        if (bothPlayersPass) {
+          phase = GamePhase.Upkeep
+          upkeepPhase()
+        }
+      }
     }
   }
 
@@ -102,26 +115,30 @@ class GameMechanics(deckPlayer1: FullDeck, deckPlayer2: FullDeck) {
     if (sum1 > sum2) Player.Player1 else Player.Player2
   }
 
-  def startNewRound() = {
+  def upkeepPhase() = {
+    val effects = mutable.Buffer.empty[HistoryEffect]
+
     areaPlayer1.characters.foreach(character => {
       if (character.health > 0 && character.isActivated) {
         character.isActivated = false
-        CharacterReadiedEffect(character.uniqueId)
+        effects += CharacterReadiedEffect(character.uniqueId)
 
         character.dices.map(dice => {
           if (dice.inPool) {
             dice.inPool = false
-            DiceOutPoolEffect(dice.uniqueId)
+            effects += DiceOutPoolEffect(dice.uniqueId)
           }
         })
       }
     })
 
     areaPlayer1.resources += 2
-    ResourceAddedEffect(Player.Player1, 2)
+    effects += ResourceAddedEffect(Player.Player1, 2)
 
     areaPlayer2.resources += 2
-    ResourceAddedEffect(Player.Player2, 2)
+    effects += ResourceAddedEffect(Player.Player2, 2)
+
+    currentRoundHistory = HistoryRound(currentRoundHistory.actions, effects, Seq.empty)
   }
 
 }
