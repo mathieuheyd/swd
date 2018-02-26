@@ -1,6 +1,6 @@
 package play
 
-import entities.{Card, Character, Dice, DiceSide}
+import entities.{Battlefield, Card, Character, Dice, DiceSide}
 
 class InPlayCharacter(val uniqueId: Int, val character: Character, val dices: Array[InPlayDice]) {
   var isActivated = false
@@ -49,6 +49,9 @@ class Deck(var cards: Seq[InPlayCard]) {
 class DiscardPile(val cards: Array[Card]) {}
 
 class PlayerArea(val player: Player.Value, val characters: Array[InPlayCharacter], val deck: Deck) {
+
+  var battlefield: Option[Battlefield] = None
+  var battlefieldClaimed = false
 
   var resources = 0
   var hand: Seq[InPlayCard] = Seq.empty

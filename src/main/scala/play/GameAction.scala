@@ -193,9 +193,11 @@ case class DiscardReroll(player: Player.Value, card: Int, dice: Int) extends Gam
 case class ClaimBattlefield(player: Player.Value) extends GameAction {
   override val phase = GamePhase.Action
   override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea): Boolean = {
-    true
+    !playerArea.battlefieldClaimed && !opponentArea.battlefieldClaimed
   }
   override def process(playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent = {
+    val battlefield = Seq(playerArea.battlefield, opponentArea.battlefield).flatten.head
+    playerArea.battlefield = Some(battlefield)
     HistoryEvent(this, Seq.empty)
   }
 }

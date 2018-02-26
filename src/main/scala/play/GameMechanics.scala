@@ -34,7 +34,6 @@ object GamePhase extends Enumeration {
 class GameMechanics(deckPlayer1: FullDeck, deckPlayer2: FullDeck) {
 
   var phase: GamePhase = GamePhase.Setup
-  var battlefieldOwner: Player.Value = Player.Player1
   var currentPlayer: Player.Value = Player.Player1
 
   val areaPlayer1: PlayerArea = initPlayerArea(Player.Player1, deckPlayer1, 100)
@@ -91,10 +90,6 @@ class GameMechanics(deckPlayer1: FullDeck, deckPlayer2: FullDeck) {
     // Post action
     phase match {
       case GamePhase.Action => {
-        action match {
-          case ClaimBattlefield(p) => battlefieldOwner = p
-        }
-
         val bothPlayersPass = currentRoundHistory.actions
           .takeRight(2)
           .forall(turn => turn.events.headOption.map(_.action) match {
@@ -105,8 +100,14 @@ class GameMechanics(deckPlayer1: FullDeck, deckPlayer2: FullDeck) {
           phase = GamePhase.Upkeep
           upkeepPhase()
         } else {
-          // end of the turn for this player
-          currentPlayer = currentPlayer.opponent
+          // end of the turn
+          if (opponentArea.battlefieldClaimed) {
+            val automaticPassAction = PassAction(player.opponent)
+            val passEvent = automaticPassAction.process(opponentArea, playerArea)
+            currentRoundHistory = HistoryRound(currentRoundHistory.actions :+ HistoryTurn(Seq(passEvent)), Seq.empty, Seq.empty)
+          } else {
+            currentPlayer = currentPlayer.opponent
+          }
         }
       }
     }
