@@ -7,6 +7,7 @@ import scala.collection.mutable
 
 trait GameAction {
   val player: Player.Value
+  val phase: GamePhase.Value
 
   def isValid(playerArea: PlayerArea, opponentArea: PlayerArea): Boolean
   def process(playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent
@@ -32,6 +33,7 @@ trait GameAction {
 //}
 
 case class PassAction(player: Player.Value) extends GameAction {
+  override val phase = GamePhase.Action
   override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea): Boolean = {
     true
   }
@@ -41,6 +43,7 @@ case class PassAction(player: Player.Value) extends GameAction {
 }
 
 case class ActivateAction(player: Player.Value, card: Int) extends GameAction {
+  override val phase = GamePhase.Action
   override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea): Boolean = {
     val character = playerArea.getCharacterOrSupport(card)
     return character.isDefined && !character.get.isActivated
@@ -64,6 +67,7 @@ case class ActivateAction(player: Player.Value, card: Int) extends GameAction {
 }
 
 case class ResolveDices(player: Player.Value, dices: Seq[Int], targets: Seq[Int]) extends GameAction {
+  override val phase = GamePhase.Action
   override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea): Boolean = {
     val inPlayDices = dices.map(id => playerArea.getDice(id))
     val areDefined = inPlayDices.forall(d => d.isDefined)
@@ -149,6 +153,7 @@ case class ResolveDices(player: Player.Value, dices: Seq[Int], targets: Seq[Int]
 }
 
 case class DiscardReroll(player: Player.Value, card: Int, dice: Int) extends GameAction {
+  override val phase = GamePhase.Action
   override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea): Boolean = {
     playerArea.getCardInHand(card).isDefined && playerArea.getDice(dice).exists(_.inPool)
   }
@@ -186,6 +191,7 @@ case class DiscardReroll(player: Player.Value, card: Int, dice: Int) extends Gam
 //}
 
 case class ClaimBattlefield(player: Player.Value) extends GameAction {
+  override val phase = GamePhase.Action
   override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea): Boolean = {
     true
   }

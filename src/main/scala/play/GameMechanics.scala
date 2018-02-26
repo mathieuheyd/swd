@@ -71,21 +71,24 @@ class GameMechanics(deckPlayer1: FullDeck, deckPlayer2: FullDeck) {
     phase = GamePhase.Mulligan
   }
 
-  def handleAction(player: Player.Value, action: GameAction) = {
+  def handleAction(player: Player.Value, action: GameAction): Boolean = {
     val (playerArea, opponentArea) = if (player == Player.Player1) (areaPlayer1, areaPlayer2) else (areaPlayer2, areaPlayer1)
-    if (action.isValid(playerArea, opponentArea)) {
-      val event = action.process(playerArea, opponentArea)
-      currentRoundHistory = HistoryRound(currentRoundHistory.actions :+ HistoryTurn(Seq(event)), Seq.empty, Seq.empty)
-    }
+
+    val validAction = action.phase == phase &&
+      (phase match {
+        case GamePhase.Action => {
+          action.player == currentPlayer
+        }
+      }) &&
+      action.isValid(playerArea, opponentArea)
+
+    if (!validAction) return false
+
+    val event = action.process(playerArea, opponentArea)
+    currentRoundHistory = HistoryRound(currentRoundHistory.actions :+ HistoryTurn(Seq(event)), Seq.empty, Seq.empty)
 
     // Post action
     phase match {
-      case GamePhase.Mulligan => {
-        //if (eventsHistory.count(event => event.isInstanceOf[MulliganEvent]) == 2) {
-        //  phase = GamePhase.Battlefield
-        //}
-      }
-      case GamePhase.Battlefield => None
       case GamePhase.Action => {
         val bothPlayersPass = currentRoundHistory.actions
           .takeRight(2)
@@ -96,9 +99,14 @@ class GameMechanics(deckPlayer1: FullDeck, deckPlayer2: FullDeck) {
         if (bothPlayersPass) {
           phase = GamePhase.Upkeep
           upkeepPhase()
+        } else {
+          // end of the turn for this player
+          currentPlayer = currentPlayer.opponent
         }
       }
     }
+
+    true
   }
 
   def rollBattlefieldDecider(): Player.Value = {
@@ -115,7 +123,7 @@ class GameMechanics(deckPlayer1: FullDeck, deckPlayer2: FullDeck) {
     if (sum1 > sum2) Player.Player1 else Player.Player2
   }
 
-  def upkeepPhase() = {
+  def upkeepPhase(): Unit = {
     val effects = mutable.Buffer.empty[HistoryEffect]
 
     areaPlayer1.characters.foreach(character => {
