@@ -13,24 +13,58 @@ trait GameAction {
   def process(playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent
 }
 
-//case class MulliganAction(cards: Seq[Int]) extends GameAction {
-//  override def isValid(phase: GamePhase.Value, playerArea: PlayerArea, opponentArea: PlayerArea): Boolean = {
-//    phase == GamePhase.Mulligan && cards.forall(id => !playerArea.getCardInHand(id).isEmpty)
-//  }
-//
-//  override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea): Seq[GameEvent] = {
-//    var drawEvent: Option[DrawEvent] = None
-//    if (cards.nonEmpty) {
-//      val c = cards.map(id => playerArea.popCardFromHand(id)).foreach(c => playerArea.putCardInDeck(c.get))
-//      playerArea.shuffleDeck()
-//      val drawCards = playerArea.drawCards(cards.size)
-//      playerArea.putCardsInHand(drawCards)
-//      drawEvent = Some(DrawEvent(player, drawCards.map(_.uniqueId)))
-//    }
-//
-//    Seq(MulliganEvent(player, cards)) ++ drawEvent
-//  }
-//}
+case class MulliganAction(player: Player.Value, cards: Seq[Int]) extends GameAction {
+  override val phase = GamePhase.Mulligan
+  override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea): Boolean = {
+    cards.forall(id => playerArea.getCardInHand(id).isDefined)
+  }
+  override def process(playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent = {
+    val effects = mutable.Buffer.empty[HistoryEffect]
+
+    if (cards.nonEmpty) {
+      cards.map(id => playerArea.popCardFromHand(id)).foreach(
+        c => {
+          playerArea.putCardInDeck(c.get)
+          effects += MulliganCardEffect(c.get.uniqueId)
+        })
+      playerArea.shuffleDeck()
+      val drawCards = playerArea.drawCards(cards.size)
+      playerArea.putCardsInHand(drawCards)
+      drawCards.map(c => effects += DrawCardEffect(c.uniqueId))
+    }
+
+    HistoryEvent(this, effects)
+  }
+}
+
+case class MulliganUpkeepAction(player: Player.Value, cardsToMulligan: Seq[Int]) extends GameAction {
+  override val phase = GamePhase.Upkeep
+  override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea): Boolean = {
+    cardsToMulligan.forall(id => playerArea.getCardInHand(id).isDefined)
+  }
+  override def process(playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent = {
+    val effects = mutable.Buffer.empty[HistoryEffect]
+
+    if (cardsToMulligan.nonEmpty) {
+      cardsToMulligan.map(id => playerArea.popCardFromHand(id)).foreach(
+        c => {
+          playerArea.putCardInDeck(c.get)
+          effects += MulliganCardEffect(c.get.uniqueId)
+        })
+    }
+
+    val cardsToDraw = 5 - playerArea.hand.size
+    (0 to cardsToDraw).foreach { _ =>
+      val drawCards = playerArea.drawCards(1)
+      if (drawCards.size == 1) {
+        playerArea.putCardsInHand(drawCards)
+        drawCards.map(c => effects += DrawCardEffect(c.uniqueId))
+      }
+    }
+
+    HistoryEvent(this, effects)
+  }
+}
 
 case class PassAction(player: Player.Value) extends GameAction {
   override val phase = GamePhase.Action
