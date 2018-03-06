@@ -80,7 +80,7 @@ class GameMechanics(deckPlayer1: FullDeck, deckPlayer2: FullDeck) {
           action.player == currentPlayer
         }
       }) &&
-      action.isValid(playerArea, opponentArea)
+      action.isValid(playerArea, opponentArea, currentRoundHistory.actions.lastOption.map(_.events).getOrElse(Seq.empty).map(_.action))
 
     if (!validAction) return false
 

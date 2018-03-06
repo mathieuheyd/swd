@@ -39,7 +39,7 @@ class GameActionSpec extends FlatSpec {
 
     val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
 
-    assert(action.isValid(playerArea, opponentArea) == false)
+    assert(action.isValid(playerArea, opponentArea, Seq.empty) == false)
   }
 
   "Activate Action" should "activate character and roll dices" in {
@@ -55,7 +55,7 @@ class GameActionSpec extends FlatSpec {
 
     val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
 
-    assert(action.isValid(playerArea, opponentArea) == true)
+    assert(action.isValid(playerArea, opponentArea, Seq.empty) == true)
 
     assert(action.process(playerArea, opponentArea) ==
       HistoryEvent(action, Seq(CharacterActivatedEffect(1), DiceInPoolEffect(2), DiceRolledEffect(2, 1))))
@@ -74,7 +74,7 @@ class GameActionSpec extends FlatSpec {
 
     val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
 
-    assert(action.isValid(playerArea, opponentArea) == false)
+    assert(action.isValid(playerArea, opponentArea, Seq.empty) == false)
   }
 
   "Resolve a dice not in pool" should "not be valid" in {
@@ -90,7 +90,7 @@ class GameActionSpec extends FlatSpec {
 
     val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
 
-    assert(action.isValid(playerArea, opponentArea) == false)
+    assert(action.isValid(playerArea, opponentArea, Seq.empty) == false)
   }
 
   "Resolve different dice symbols" should "not be valid" in {
@@ -108,7 +108,7 @@ class GameActionSpec extends FlatSpec {
 
     val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
 
-    assert(action.isValid(playerArea, opponentArea) == false)
+    assert(action.isValid(playerArea, opponentArea, Seq.empty) == false)
   }
 
   "Resolve only modified dices" should "not be valid" in {
@@ -126,7 +126,7 @@ class GameActionSpec extends FlatSpec {
 
     val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
 
-    assert(action.isValid(playerArea, opponentArea) == false)
+    assert(action.isValid(playerArea, opponentArea, Seq.empty) == false)
   }
 
   "Resolve dices with cost" should "remove resources from the player" in {
@@ -145,7 +145,7 @@ class GameActionSpec extends FlatSpec {
 
     val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
 
-    assert(action.isValid(playerArea, opponentArea) == true)
+    assert(action.isValid(playerArea, opponentArea, Seq.empty) == true)
     action.process(playerArea, opponentArea)
 
     assert(playerArea.resources == 1)
@@ -165,7 +165,7 @@ class GameActionSpec extends FlatSpec {
 
     val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
 
-    assert(action.isValid(playerArea, opponentArea) == true)
+    assert(action.isValid(playerArea, opponentArea, Seq.empty) == true)
     action.process(playerArea, opponentArea)
 
     assert(playerArea.resources == 4)
