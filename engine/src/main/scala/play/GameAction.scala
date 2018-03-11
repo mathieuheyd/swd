@@ -78,7 +78,7 @@ case class PassAction(player: Player.Value) extends GameAction {
 
 case class ActivateAction(player: Player.Value, card: Int) extends GameAction {
   override val phase = GamePhase.Action
-  override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea): Boolean = {
+  override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean = {
     val character = playerArea.getCharacterOrSupport(card)
     return character.isDefined && !character.get.isActivated
   }
