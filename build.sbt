@@ -18,6 +18,7 @@ lazy val engine = project
   )
 
 lazy val webServer = project
+  .in(file("./web-server"))
   .settings(
     name := "web-server",
     settings,
