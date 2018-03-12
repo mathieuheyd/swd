@@ -7,12 +7,21 @@ lazy val global = project
   .settings(settings)
   .aggregate(
     engine,
+    matchMaking,
     webServer
   )
 
 lazy val engine = project
   .settings(
     name := "engine",
+    settings,
+    libraryDependencies ++= commonDependencies
+  )
+
+lazy val matchMaking = project
+  .in(file("./match-making"))
+  .settings(
+    name := "match-making",
     settings,
     libraryDependencies ++= commonDependencies
   )
