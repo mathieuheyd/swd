@@ -1,25 +1,24 @@
-package main.scala
+import scala.collection.mutable.ListBuffer
 
 class MatchMaker {
 
-  val registeredPlayers = Seq()
+  var registeredPlayers = ListBuffer[String]()
 
   def registerPlayer(id: String) = {
     registeredPlayers += id
   }
 
   def unregisterPlayer(id: String) = {
-    registerPlayer -= id
+    registeredPlayers -= id
   }
 
   def newGame(): Option[(String, String)] = {
-    registerPlayer match {
-      case player1 :: player2 :: remaining => {
-        registeredPlayers = remaining
-        Some((player1, player2))
-      }
-      case _ => None
-    }
+    if (registeredPlayers.size >= 2) {
+      val player1 = registeredPlayers.remove(0)
+      val player2 = registeredPlayers.remove(0)
+      Some((player1, player2))
+    } else
+      None
   }
 
 }
