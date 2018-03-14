@@ -46,6 +46,9 @@ object GameServer {
         get {
           handleWebSocketMessages(newUser())
         }
+      } ~
+      pathPrefix("client") {
+        getFromResourceDirectory("client")
       }
 
     val binding = Await.result(Http().bindAndHandle(route, "127.0.0.1", 8080), 3.seconds)
