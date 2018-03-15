@@ -4,6 +4,7 @@ object MatchMaking {
   case class Register(id: String)
   case object Unregister
   case object FindGame
+  case class NewGame(id: String)
 }
 
 class MatchMakingActor extends Actor {
@@ -33,8 +34,11 @@ class MatchMakingActor extends Actor {
       matchMaker.newGame() match {
         case None => Nil
         case Some((player1, player2)) => {
-          unregister(player1)
-          unregister(player2)
+          val actor1 = unregister(player1)
+          val actor2 = unregister(player2)
+          val newGameId = player1 + player2
+          actor1 ! NewGame(newGameId)
+          actor2 ! NewGame(newGameId)
         }
       }
       if (players.size >= 2) self ! FindGame
@@ -44,12 +48,14 @@ class MatchMakingActor extends Actor {
     val actor = reversePlayers(id)
     players -= actor
     reversePlayers -= id
+    actor
   }
 
   private def unregister(actor: ActorRef) = {
     val id = players(actor)
     reversePlayers -= id
     players -= actor
+    id
   }
   
 }
