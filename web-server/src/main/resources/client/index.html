@@ -1,8 +1,22 @@
 <html>
   <head>
     <title>SWD test page</title>
+    <script type="text/javascript">
+      function findGame(name) {
+        var match = new WebSocket("ws://localhost:8080/match");
+        match.onopen = function() {
+          console.log('Connected to Match Making')
+          match.send(name)
+        }
+        match.onclose = function() { console.log('Connection to Match Making closed') }
+        match.onmessage = function(message) { console.log('New game found:', message.data) }
+        window.onbeforeunload = function() { match.close() }
+      }
+    </script>
   </head>
   <body>
-    Welcome to SWD test page
+    Name
+    <input type="text" id="name" />
+    <button onclick="findGame(document.getElementById('name').value)">Find Game</button>
   </body>
 </html>

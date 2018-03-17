@@ -3,11 +3,11 @@ import akka.actor._
 object MatchMaking {
   case class Register(id: String)
   case object Unregister
-  case object FindGame
   case class NewGame(id: String)
+  protected case object FindGame
 }
 
-class MatchMakingActor extends Actor {
+class MatchMaking extends Actor {
   import MatchMaking._
   
   val matchMaker = new MatchMaker()

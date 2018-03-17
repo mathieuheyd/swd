@@ -15,6 +15,9 @@ object GameServer {
     implicit val system = ActorSystem()
     implicit val materializer = ActorMaterializer()
 
+    val matchMaking = system.actorOf(Props(new MatchMaking), "match-making")
+    val ganeRouter = system.actorOf(Props(new GameRouter), "game-router")
+
     val gameRoom = system.actorOf(Props(new GameRoom), "game")
 
     def newUser(): Flow[Message, Message, NotUsed] = {
@@ -41,7 +44,31 @@ object GameServer {
       Flow.fromSinkAndSource(incomingMessages, outgoingMessages)
     }
 
+    def newMatchMaking(): Flow[Message, Message, NotUsed] = {
+      val userActor = system.actorOf(Props(new MatchMakingUser(matchMaking)))
+
+      val incomingMessages: Sink[Message, NotUsed] =
+        Flow[Message].map {
+          case TextMessage.Strict(text) => MatchMakingUser.IncomingMessage(text)
+        }.to(Sink.actorRef[MatchMakingUser.IncomingMessage](userActor, PoisonPill))
+
+      val outgoingMessages: Source[Message, NotUsed] =
+        Source.actorRef[MatchMakingUser.OutgoingMessage](10, OverflowStrategy.fail)
+          .mapMaterializedValue { outActor =>
+            userActor ! MatchMakingUser.Connected(outActor)
+            NotUsed
+          }.map(
+          (outMsg: MatchMakingUser.OutgoingMessage) => TextMessage(outMsg.text))
+
+      Flow.fromSinkAndSource(incomingMessages, outgoingMessages)
+    }
+
     val route =
+      path("match") {
+        get {
+          handleWebSocketMessages(newMatchMaking())
+        }
+      } ~
       path("game") {
         get {
           handleWebSocketMessages(newUser())
