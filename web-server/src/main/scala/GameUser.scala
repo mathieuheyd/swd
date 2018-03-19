@@ -2,27 +2,38 @@ import akka.actor._
 
 object GameUser {
   case class Connected(outgoing: ActorRef)
+  case class JoinGame(gameRoom: ActorRef)
   case class IncomingMessage(text: String)
   case class OutgoingMessage(text: String)
 }
 
-class GameUser(gameRoom: ActorRef) extends Actor {
+class GameUser() extends Actor {
   import GameUser._
 
+  var gameRoom: Option[ActorRef] = None
+  var outgoing: Option[ActorRef] = None
+
   def receive = {
-    case Connected(outgoing) =>
-      context.become(connected(outgoing))
+    case Connected(out) =>
+      outgoing = Some(out)
+      if (gameRoom.isDefined && outgoing.isDefined)
+        context.become(connected())
+
+    case JoinGame(room) =>
+      gameRoom = Some(room)
+      if (gameRoom.isDefined && outgoing.isDefined)
+        context.become(connected())
   }
 
-  def connected(outgoing: ActorRef): Receive = {
-    gameRoom ! GameRoom.Join
+  def connected(): Receive = {
+    gameRoom.get ! GameRoom.Join
 
     {
       case IncomingMessage(text) =>
-        gameRoom ! GameRoom.ChatMessage(text)
+        gameRoom.get ! GameRoom.ChatMessage(text)
 
       case GameRoom.ChatMessage(text) =>
-        outgoing ! OutgoingMessage(text)
+        outgoing.get ! OutgoingMessage(text)
     }
   }
 

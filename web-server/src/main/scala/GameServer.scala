@@ -15,32 +15,25 @@ object GameServer {
     implicit val system = ActorSystem()
     implicit val materializer = ActorMaterializer()
 
-    val matchMaking = system.actorOf(Props(new MatchMaking), "match-making")
     val ganeRouter = system.actorOf(Props(new GameRouter), "game-router")
+    val matchMaking = system.actorOf(Props(new MatchMaking(ganeRouter)), "match-making")
 
-    val gameRoom = system.actorOf(Props(new GameRoom), "game")
-
-    def newUser(): Flow[Message, Message, NotUsed] = {
-      // new connection - new user actor
-      val userActor = system.actorOf(Props(new GameUser(gameRoom)))
+    def newGameUser(gameId: String): Flow[Message, Message, NotUsed] = {
+      val userActor = system.actorOf(Props(new GameUser))
 
       val incomingMessages: Sink[Message, NotUsed] =
         Flow[Message].map {
-          // transform websocket message to domain message
           case TextMessage.Strict(text) => GameUser.IncomingMessage(text)
         }.to(Sink.actorRef[GameUser.IncomingMessage](userActor, PoisonPill))
 
       val outgoingMessages: Source[Message, NotUsed] =
         Source.actorRef[GameUser.OutgoingMessage](10, OverflowStrategy.fail)
-        .mapMaterializedValue { outActor =>
-          // give the user actor a way to send messages out
-          userActor ! GameUser.Connected(outActor)
-          NotUsed
-        }.map(
-          // transform domain message to web socket message
+          .mapMaterializedValue { outActor =>
+            userActor ! GameUser.Connected(outActor)
+            NotUsed
+          }.map(
           (outMsg: GameUser.OutgoingMessage) => TextMessage(outMsg.text))
 
-      // then combine both to a flow
       Flow.fromSinkAndSource(incomingMessages, outgoingMessages)
     }
 
@@ -70,9 +63,12 @@ object GameServer {
         }
       } ~
       path("game") {
-        get {
-          handleWebSocketMessages(newUser())
+        path(Remaining) { gameId =>
+          get {
+            handleWebSocketMessages(newGameUser(gameId))
+          }
         }
+
       } ~
       pathPrefix("client") {
         getFromResourceDirectory("client")

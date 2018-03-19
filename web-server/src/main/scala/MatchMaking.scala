@@ -3,11 +3,10 @@ import akka.actor._
 object MatchMaking {
   case class Register(id: String)
   case object Unregister
-  case class NewGame(id: String)
   protected case object FindGame
 }
 
-class MatchMaking extends Actor {
+class MatchMaking(gameRouter: ActorRef) extends Actor {
   import MatchMaking._
   
   val matchMaker = new MatchMaker()
@@ -37,8 +36,7 @@ class MatchMaking extends Actor {
           val actor1 = unregister(player1)
           val actor2 = unregister(player2)
           val newGameId = player1 + player2
-          actor1 ! NewGame(newGameId)
-          actor2 ! NewGame(newGameId)
+          gameRouter ! GameRouter.NewGame(newGameId, actor1, actor2)
         }
       }
       if (players.size >= 2) self ! FindGame

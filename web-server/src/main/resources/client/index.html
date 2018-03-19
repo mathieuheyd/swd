@@ -5,12 +5,30 @@
       function findGame(name) {
         var match = new WebSocket("ws://localhost:8080/match");
         match.onopen = function() {
-          console.log('Connected to Match Making')
-          match.send(name)
+          console.log('Connected to Match Making');
+          match.send(name);
         }
         match.onclose = function() { console.log('Connection to Match Making closed') }
-        match.onmessage = function(message) { console.log('New game found:', message.data) }
+        match.onmessage = function(message) {
+          console.log('New game found:', message.data);
+          initGame(message.data);
+        }
         window.onbeforeunload = function() { match.close() }
+      }
+      var gameSocket;
+      function initGame(id) {
+        gameSocket = new WebSocket("ws://localhost:8080/game/" + id);
+        match.onopen = function() { console.log('Connected to Game') }
+        match.onclose = function() { console.log('Connection to Game closed') }
+        match.onmessage = function(message) {
+          console.log('New message:', message.data);
+          var history = document.getElementById('history');
+          history.value = history.value + '\n' + message.data;
+        }
+        window.onbeforeunload = function() { gameSocket.close() }
+      }
+      function sendMessage(message) {
+        gameSocket.send(message);
       }
     </script>
   </head>
@@ -18,5 +36,13 @@
     Name
     <input type="text" id="name" />
     <button onclick="findGame(document.getElementById('name').value)">Find Game</button>
+    </br>
+    </br>
+    Game
+    </br>
+    <textarea id="history" readonly="readonly" cols="100" rows="25"></textarea>
+    </br>
+    <input type=="text" id="message" />
+    <button onclick="sendMessage(document.getElementById('message').value)">Send Message</button>
   </body>
 </html>
