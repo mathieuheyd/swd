@@ -18,9 +18,9 @@
       var gameSocket;
       function initGame(id) {
         gameSocket = new WebSocket("ws://localhost:8080/game/" + id);
-        match.onopen = function() { console.log('Connected to Game') }
-        match.onclose = function() { console.log('Connection to Game closed') }
-        match.onmessage = function(message) {
+        gameSocket.onopen = function() { console.log('Connected to Game') }
+        gameSocket.onclose = function() { console.log('Connection to Game closed') }
+        gameSocket.onmessage = function(message) {
           console.log('New message:', message.data);
           var history = document.getElementById('history');
           history.value = history.value + '\n' + message.data;

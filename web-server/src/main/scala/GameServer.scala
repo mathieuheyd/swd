@@ -15,11 +15,12 @@ object GameServer {
     implicit val system = ActorSystem()
     implicit val materializer = ActorMaterializer()
 
-    val ganeRouter = system.actorOf(Props(new GameRouter), "game-router")
-    val matchMaking = system.actorOf(Props(new MatchMaking(ganeRouter)), "match-making")
+    val gameRouter = system.actorOf(Props(new GameRouter), "game-router")
+    val matchMaking = system.actorOf(Props(new MatchMaking(gameRouter)), "match-making")
 
     def newGameUser(gameId: String): Flow[Message, Message, NotUsed] = {
       val userActor = system.actorOf(Props(new GameUser))
+      gameRouter ! GameRouter.UserJoin(gameId, userActor)
 
       val incomingMessages: Sink[Message, NotUsed] =
         Flow[Message].map {
@@ -62,7 +63,7 @@ object GameServer {
           handleWebSocketMessages(newMatchMaking())
         }
       } ~
-      path("game") {
+      pathPrefix("game") {
         path(Remaining) { gameId =>
           get {
             handleWebSocketMessages(newGameUser(gameId))
