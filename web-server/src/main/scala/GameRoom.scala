@@ -1,18 +1,21 @@
 import akka.actor._
+import collection.{StarterKyloRen, StarterRey}
+import play.GameMechanics
 
 object GameRoom {
   case object Join
   case class ChatMessage(message: String)
 }
 
-class GameRoom extends Actor {
+class GameRoom(player1: String, player2: String) extends Actor {
   import GameRoom._
+
   var users: Set[ActorRef] = Set.empty
+  val game = new GameMechanics(StarterRey.deck, StarterKyloRen.deck)
 
   def receive = {
     case Join =>
       users += sender()
-      // we also would like to remove the user when its actor is stopped
       context.watch(sender())
 
     case Terminated(user) =>

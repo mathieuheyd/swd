@@ -37,7 +37,7 @@ lazy val webServer = project
       dependencies.akkastream
     )
   )
-  .dependsOn(matchMaking)
+  .dependsOn(matchMaking, engine)
 
 lazy val settings = Seq()
 
