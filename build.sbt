@@ -12,6 +12,7 @@ lazy val global = project
   )
 
 lazy val engine = project
+  .in(file("./engine"))
   .settings(
     name := "engine",
     settings,
