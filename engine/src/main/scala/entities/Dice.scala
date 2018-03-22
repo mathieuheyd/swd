@@ -1,7 +1,7 @@
 package entities
 
 object DiceSideSymbol extends Enumeration {
-  type DiceSideSynbol = Value
+  type DiceSideSymbol = Value
   val MeleeDamage, RangedDamage, Shield, Resource, Disrupt, Discard, Focus, Special, Blank = Value
 }
 
