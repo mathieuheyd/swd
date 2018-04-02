@@ -5,7 +5,7 @@ object CardSet extends Enumeration {
   val Awakenings, SpiritOfRebellion, EmpireAtWar, TwoPlayersGame = Value
 }
 
-case class CardId(val set: CardSet.Value, val id: Int)
+case class CardId(set: CardSet.Value, id: Int)
 
 object Affiliation extends Enumeration {
   type Affiliation = Value

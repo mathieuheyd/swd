@@ -31,7 +31,7 @@ object GamePhase extends Enumeration {
   val Setup, Mulligan, Battlefield, Action, Upkeep = Value
 }
 
-class GameMechanics(deckPlayer1: FullDeck, deckPlayer2: FullDeck) {
+class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
 
   var phase: GamePhase = GamePhase.Setup
   var currentPlayer: Player.Value = Player.Player1
@@ -62,11 +62,9 @@ class GameMechanics(deckPlayer1: FullDeck, deckPlayer2: FullDeck) {
 
     val cardsPlayer1 = areaPlayer1.drawCards(5)
     areaPlayer1.putCardsInHand(cardsPlayer1)
-    //addEvent(DrawEvent(Player.Player1, cardsPlayer1.map(_.uniqueId)))
 
     val cardsPlayer2 = areaPlayer2.drawCards(5)
     areaPlayer2.putCardsInHand(cardsPlayer2)
-    //addEvent(DrawEvent(Player.Player2, cardsPlayer2.map(_.uniqueId)))
 
     phase = GamePhase.Mulligan
   }

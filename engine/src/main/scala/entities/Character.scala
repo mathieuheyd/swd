@@ -2,22 +2,22 @@ package entities
 
 case class CharacterPoints(primary: Int, elite: Option[Int])
 
-case class Character(val id: CardId,
-                     val title: String,
-                     val subtitle: Option[String],
-                     val affiliation: Affiliation.Value,
-                     val color: CardColor.Value,
-                     val unique: Boolean,
-                     val rarity: CardRarity.Value,
-                     val dice: Option[Dice],
-                     val points: CharacterPoints,
-                     val maxHealth:Int)
+case class Character(id: CardId,
+                     title: String,
+                     subtitle: Option[String],
+                     affiliation: Affiliation.Value,
+                     color: CardColor.Value,
+                     unique: Boolean,
+                     rarity: CardRarity.Value,
+                     dice: Option[Dice],
+                     points: CharacterPoints,
+                     maxHealth:Int)
   extends Card with WithSubtitle with WithUniqueness with WithAffiliation with WithDice {
 
   val cardType: CardType.Value = CardType.Character
 
-  def canElite(): Boolean = {
-    return !points.elite.isEmpty
+  def canElite: Boolean = {
+    points.elite.isDefined
   }
 
   def points(elite: Boolean): Int = {

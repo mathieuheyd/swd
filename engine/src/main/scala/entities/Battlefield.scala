@@ -1,9 +1,9 @@
 package entities
 
-case class Battlefield(val id:CardId,
-                       val title: String,
-                       val subtitle: Option[String],
-                       val rarity: CardRarity.Value)
+case class Battlefield(id:CardId,
+                       title: String,
+                       subtitle: Option[String],
+                       rarity: CardRarity.Value)
   extends Card with WithSubtitle {
 
   val color: CardColor.Value = CardColor.Gray
