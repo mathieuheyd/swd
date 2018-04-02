@@ -75,7 +75,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
     val validAction = action.phase == phase &&
       (phase match {
         case GamePhase.Action => {
-          action.player == currentPlayer
+          player == currentPlayer
         }
       }) &&
       action.isValid(playerArea, opponentArea, currentRoundHistory.actions.lastOption.map(_.events).getOrElse(Seq.empty).map(_.action))
@@ -91,7 +91,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
         val bothPlayersPass = currentRoundHistory.actions
           .takeRight(2)
           .forall(turn => turn.events.headOption.map(_.action) match {
-            case Some(PassAction(_)) => true
+            case Some(PassAction()) => true
             case _ => false
           })
         if (bothPlayersPass) {
@@ -100,7 +100,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
         } else {
           // end of the turn
           if (opponentArea.battlefieldClaimed) {
-            val automaticPassAction = PassAction(player.opponent)
+            val automaticPassAction = PassAction()
             val passEvent = automaticPassAction.process(opponentArea, playerArea)
             currentRoundHistory = HistoryRound(currentRoundHistory.actions :+ HistoryTurn(Seq(passEvent)), Seq.empty, Seq.empty)
           } else {

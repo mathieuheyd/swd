@@ -66,7 +66,9 @@ class GameController(gameMechanics: GameMechanics) {
     areaPlayer.hand.map(c => CardView(c.uniqueId, c.card.id))
   }
 
-  def playerAction(): Seq[BothSideEventView] = {
+  def playerAction(player: Player.Value, action: GameAction): Seq[BothSideEventView] = {
+    gameMechanics.handleAction(player, action)
+
     Seq.empty
   }
 

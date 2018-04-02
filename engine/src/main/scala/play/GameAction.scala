@@ -6,14 +6,13 @@ import play.history._
 import scala.collection.mutable
 
 trait GameAction {
-  val player: Player.Value
   val phase: GamePhase.Value
 
   def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean
   def process(playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent
 }
 
-case class MulliganAction(player: Player.Value, cards: Seq[Int]) extends GameAction {
+case class MulliganAction(cards: Seq[Int]) extends GameAction {
   override val phase = GamePhase.Mulligan
   override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean = {
     cards.forall(id => playerArea.getCardInHand(id).isDefined)
@@ -37,7 +36,7 @@ case class MulliganAction(player: Player.Value, cards: Seq[Int]) extends GameAct
   }
 }
 
-case class MulliganUpkeepAction(player: Player.Value, cardsToMulligan: Seq[Int]) extends GameAction {
+case class MulliganUpkeepAction(cardsToMulligan: Seq[Int]) extends GameAction {
   override val phase = GamePhase.Upkeep
   override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean = {
     cardsToMulligan.forall(id => playerArea.getCardInHand(id).isDefined)
@@ -66,7 +65,7 @@ case class MulliganUpkeepAction(player: Player.Value, cardsToMulligan: Seq[Int])
   }
 }
 
-case class PassAction(player: Player.Value) extends GameAction {
+case class PassAction() extends GameAction {
   override val phase = GamePhase.Action
   override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean = {
     true
@@ -76,7 +75,7 @@ case class PassAction(player: Player.Value) extends GameAction {
   }
 }
 
-case class ActivateAction(player: Player.Value, card: Int) extends GameAction {
+case class ActivateAction(card: Int) extends GameAction {
   override val phase = GamePhase.Action
   override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean = {
     val character = playerArea.getCharacterOrSupport(card)
@@ -100,7 +99,7 @@ case class ActivateAction(player: Player.Value, card: Int) extends GameAction {
   }
 }
 
-case class ResolveDices(player: Player.Value, dices: Seq[Int], targets: Seq[Int]) extends GameAction {
+case class ResolveDices(dices: Seq[Int], targets: Seq[Int]) extends GameAction {
   override val phase = GamePhase.Action
   override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean = {
     val inPlayDices = dices.map(id => playerArea.getDice(id))
@@ -186,7 +185,7 @@ case class ResolveDices(player: Player.Value, dices: Seq[Int], targets: Seq[Int]
   }
 }
 
-case class DiscardReroll(player: Player.Value, card: Int, dice: Int) extends GameAction {
+case class DiscardReroll(card: Int, dice: Int) extends GameAction {
   override val phase = GamePhase.Action
   override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean = {
     playerArea.getCardInHand(card).isDefined && playerArea.getDice(dice).exists(_.inPool)
@@ -224,7 +223,7 @@ case class DiscardReroll(player: Player.Value, card: Int, dice: Int) extends Gam
 //  }
 //}
 
-case class ClaimBattlefield(player: Player.Value) extends GameAction {
+case class ClaimBattlefield() extends GameAction {
   override val phase = GamePhase.Action
   override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean = {
     !playerArea.battlefieldClaimed && !opponentArea.battlefieldClaimed

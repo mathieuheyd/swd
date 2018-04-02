@@ -14,7 +14,7 @@ class GameRouter extends Actor {
 
   def receive = {
     case NewGame(id, player1, player2) => {
-      val newGame = context.actorOf(Props(new GameRoom), "game" + id)
+      val newGame = context.actorOf(Props(new GameRoom("player1", "player2")), "game" + id)
       games += (id -> GameActors(newGame, player1, player2))
       player1 ! MatchMakingUser.NewGame(id)
       player2 ! MatchMakingUser.NewGame(id)
