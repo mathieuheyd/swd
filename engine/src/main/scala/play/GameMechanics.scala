@@ -69,7 +69,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
     phase = GamePhase.Mulligan
   }
 
-  def handleAction(player: Player.Value, action: GameAction): Boolean = {
+  def handleAction(player: Player.Value, action: GameAction): Option[HistoryEvent] = {
     val (playerArea, opponentArea) = if (player == Player.Player1) (areaPlayer1, areaPlayer2) else (areaPlayer2, areaPlayer1)
 
     val validAction = action.phase == phase &&
@@ -80,7 +80,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
       }) &&
       action.isValid(playerArea, opponentArea, currentRoundHistory.actions.lastOption.map(_.events).getOrElse(Seq.empty).map(_.action))
 
-    if (!validAction) return false
+    if (!validAction) return None
 
     val event = action.process(playerArea, opponentArea)
     currentRoundHistory = HistoryRound(currentRoundHistory.actions :+ HistoryTurn(Seq(event)), Seq.empty, Seq.empty)
@@ -110,7 +110,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
       }
     }
 
-    true
+    Some(event)
   }
 
   def rollBattlefieldDecider(): Player.Value = {
