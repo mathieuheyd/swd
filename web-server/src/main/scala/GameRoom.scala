@@ -42,6 +42,9 @@ class GameRoom(player1: String, player2: String) extends Actor {
     actorPlayer2.get ! GameUser.GameStart(player2, player1)
 
     val setupEvents = controller.startGame()
-
+    setupEvents.foreach { bothSideEvent =>
+      actorPlayer1.get ! EventViewMessage(bothSideEvent.player1)
+      actorPlayer2.get ! EventViewMessage(bothSideEvent.player2)
+    }
   }
 }

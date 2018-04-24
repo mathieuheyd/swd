@@ -38,7 +38,8 @@ lazy val webServer = project
       dependencies.argonaut,
       dependencies.argonautscalaz,
       dependencies.argonautMonocle,
-      dependencies.argonautCats
+      dependencies.argonautCats,
+      dependencies.argonautShapeless
     )
   )
   .dependsOn(matchMaking, engine)
@@ -58,4 +59,5 @@ lazy val dependencies =
     val argonautscalaz = "io.argonaut" %% "argonaut-scalaz" % "6.2"
     val argonautMonocle = "io.argonaut" %% "argonaut-monocle" % "6.2"
     val argonautCats = "io.argonaut" %% "argonaut-cats" % "6.2"
+    val argonautShapeless = "com.github.alexarchambault" %% "argonaut-shapeless_6.2" % "1.2.0-M4"
   }
