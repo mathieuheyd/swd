@@ -5,14 +5,14 @@ import play.history._
 
 import scala.collection.mutable
 
-trait GameAction {
+sealed trait GameAction {
   val phase: GamePhase.Value
 
   def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean
   def process(playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent
 }
 
-case class MulliganAction(cards: Seq[Int]) extends GameAction {
+case class MulliganAction(cards: List[Int]) extends GameAction {
   override val phase = GamePhase.Mulligan
   override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean = {
     cards.forall(id => playerArea.getCardInHand(id).isDefined)
@@ -36,7 +36,7 @@ case class MulliganAction(cards: Seq[Int]) extends GameAction {
   }
 }
 
-case class MulliganUpkeepAction(cardsToMulligan: Seq[Int]) extends GameAction {
+case class MulliganUpkeepAction(cardsToMulligan: List[Int]) extends GameAction {
   override val phase = GamePhase.Upkeep
   override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean = {
     cardsToMulligan.forall(id => playerArea.getCardInHand(id).isDefined)
@@ -99,7 +99,7 @@ case class ActivateAction(card: Int) extends GameAction {
   }
 }
 
-case class ResolveDices(dices: Seq[Int], targets: Seq[Int]) extends GameAction {
+case class ResolveDices(dices: List[Int], targets: List[Int]) extends GameAction {
   override val phase = GamePhase.Action
   override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean = {
     val inPlayDices = dices.map(id => playerArea.getDice(id))

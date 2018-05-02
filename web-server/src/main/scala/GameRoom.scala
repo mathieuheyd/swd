@@ -1,6 +1,6 @@
 import akka.actor._
 import collection.{StarterKyloRen, StarterRey}
-import play.GameMechanics
+import play.{GameAction, GameMechanics}
 import view.{EventView, GameController}
 
 object GameRoom {
@@ -9,6 +9,8 @@ object GameRoom {
 
   case class GameStart(playerName: String, opponentName: String)
   case class EventViewMessage(event: EventView)
+
+  case class PlayerActionMessage(action: GameAction)
 }
 
 class GameRoom(player1: String, player2: String) extends Actor {
@@ -38,8 +40,8 @@ class GameRoom(player1: String, player2: String) extends Actor {
   def startGame() = {
     Console.out.println(actorPlayer1)
     Console.out.println(actorPlayer2)
-    actorPlayer1.get ! GameUser.GameStart(player1, player2)
-    actorPlayer2.get ! GameUser.GameStart(player2, player1)
+    actorPlayer1.get ! GameStart(player1, player2)
+    actorPlayer2.get ! GameStart(player2, player1)
 
     val setupEvents = controller.startGame()
     setupEvents.foreach { bothSideEvent =>

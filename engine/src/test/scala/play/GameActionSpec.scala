@@ -62,7 +62,7 @@ class GameActionSpec extends FlatSpec {
   }
 
   "Resolve a non-existing dice" should "not be valid" in {
-    val action = ResolveDices(Seq(3), Seq.empty)
+    val action = ResolveDices(List(3), List.empty)
 
     val playerArea = new PlayerArea(
       Player.Player1,
@@ -78,7 +78,7 @@ class GameActionSpec extends FlatSpec {
   }
 
   "Resolve a dice not in pool" should "not be valid" in {
-    val action = ResolveDices(Seq(2), Seq.empty)
+    val action = ResolveDices(List(2), List.empty)
 
     val playerArea = new PlayerArea(
       Player.Player1,
@@ -94,7 +94,7 @@ class GameActionSpec extends FlatSpec {
   }
 
   "Resolve different dice symbols" should "not be valid" in {
-    val action = ResolveDices(Seq(2, 3), Seq.empty)
+    val action = ResolveDices(List(2, 3), List.empty)
 
     val playerArea = new PlayerArea(
       Player.Player1,
@@ -112,7 +112,7 @@ class GameActionSpec extends FlatSpec {
   }
 
   "Resolve only modified dices" should "not be valid" in {
-    val action = ResolveDices(Seq(2, 3), Seq.empty)
+    val action = ResolveDices(List(2, 3), List.empty)
 
     val playerArea = new PlayerArea(
       Player.Player1,
@@ -130,7 +130,7 @@ class GameActionSpec extends FlatSpec {
   }
 
   "Resolve dices with cost" should "remove resources from the player" in {
-    val action = ResolveDices(Seq(2, 3), Seq.empty)
+    val action = ResolveDices(List(2, 3), List.empty)
 
     val playerArea = new PlayerArea(
       Player.Player1,
@@ -152,7 +152,7 @@ class GameActionSpec extends FlatSpec {
   }
 
   "Resolve a resource dice" should "add resource to the player" in {
-    val action = ResolveDices(Seq(2), Seq.empty)
+    val action = ResolveDices(List(2), List.empty)
 
     val playerArea = new PlayerArea(
       Player.Player1,

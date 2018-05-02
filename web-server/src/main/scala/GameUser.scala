@@ -2,8 +2,9 @@ import akka.actor._
 import argonaut._
 import Argonaut._
 import ArgonautShapeless._
-import GameRoom.EventViewMessage
-import entities.{CardId, CardSet}
+import GameRoom.{EventViewMessage, GameStart}
+import entities.CardSet
+import play.GameAction
 import view.EventView
 
 object GameUser {
@@ -13,7 +14,9 @@ object GameUser {
   case class IncomingMessage(text: String)
   case class OutgoingMessage(text: String)
 
-  case class GameStart(playerName: String, opponentName: String)
+  sealed trait UserMessage
+  case class ChatUserMessage(text: String) extends UserMessage
+  case class ActionUserMessage(action: GameAction) extends UserMessage
 
   implicit def GameStartEncodeJson: EncodeJson[GameStart] =
     EncodeJson(gameStart =>
@@ -22,10 +25,11 @@ object GameUser {
       ("opponent_name" := gameStart.playerName) ->: jEmptyObject)
 
   implicit def CardSetEncodeJson: EncodeJson[CardSet.CardSet] = EncodeJson({
-    case _ => "CardSet".asJson
+    case value => value.toString.asJson
   })
 
   val eventViewEncoder = EncodeJson.of[EventView]
+  val userMessageDecoder = DecodeJson.of[UserMessage]
 }
 
 class GameUser() extends Actor {
