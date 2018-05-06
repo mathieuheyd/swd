@@ -29,7 +29,7 @@ object GameUser {
   })
 
   val eventViewEncoder = EncodeJson.of[EventView]
-  val userMessageDecoder = DecodeJson.of[UserMessage]
+  implicit def userMessageDecoder = DecodeJson.of[UserMessage]
 }
 
 class GameUser() extends Actor {
@@ -55,7 +55,15 @@ class GameUser() extends Actor {
 
     {
       case IncomingMessage(text) =>
-        gameRoom.get ! GameRoom.ChatMessage(text)
+        val message = Parse.decode[UserMessage](text)
+        if (message.isRight) {
+          message.right.get match {
+            case ChatUserMessage(chatMessage) => gameRoom.get ! GameRoom.ChatMessage(chatMessage)
+            case ActionUserMessage(action) => gameRoom.get ! GameRoom.PlayerActionMessage(action)
+          }
+        } else {
+          Console.out.println("Badly fornatted message", text)
+        }
 
       case GameRoom.ChatMessage(text) =>
         outgoing.get ! OutgoingMessage(text)
