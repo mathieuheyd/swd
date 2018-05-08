@@ -23,12 +23,24 @@
         gameSocket.onmessage = function(message) {
           console.log('New message:', message.data);
           var history = document.getElementById('history');
-          history.value = history.value + '\n' + message.data;
+          history.value = history.value + message.data + '\n';
         }
         window.onbeforeunload = function() { gameSocket.close() }
       }
       function sendMessage(message) {
         gameSocket.send(message);
+      }
+
+      var sampleChatMessage = '{"ChatUserMessage":{"text":"Hello world!"}}';
+
+      function chatMessage(text) {
+        return '{"ChatUserMessage":{"text":"' + text + '"}}';
+      }
+      function mulliganMessage(cards) {
+        return '{"ActionUserMessage":{"action":{"MulliganAction":{"cards":[' + cards.join(',') + ']}}}}';
+      }
+      function chooseBattefield(card) {
+        return '{"ActionUserMessage":{"action":{"ChooseBattlefield":{"card":' + card + '}}}}';
       }
     </script>
   </head>

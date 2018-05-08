@@ -1,5 +1,5 @@
 package play.history
 
-import play.GameAction
+import play.{GameAction, Player}
 
-case class HistoryEvent(action: GameAction, effects: Seq[HistoryEffect]) {}
+case class HistoryEvent(player: Player.Value, action: GameAction, effects: Seq[HistoryEffect]) {}

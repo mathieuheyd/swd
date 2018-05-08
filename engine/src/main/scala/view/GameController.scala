@@ -1,7 +1,8 @@
 package view
 
-import entities.{Battlefield, CardId}
+import entities.{Battlefield, CardId, CardSet}
 import play._
+import play.history.{DrawCardEffect, HistoryEffect, HistoryEvent, MulliganCardEffect}
 
 import scala.collection.mutable
 
@@ -21,7 +22,9 @@ case class SetupView(player: PlayerSetupView, opponent: PlayerSetupView) extends
 case class DrawStartingHandView(player: List[CardView], opponent: Int) extends EventView
 
 case class ActionView() extends EventView
-case class EffectView() extends EventView
+//case class EffectView() extends EventView
+case class MulliganEffectView(card: CardView) extends EventView
+case class DrawCardEffectView(card: CardView) extends EventView
 
 case class BothSideEventView(player1: EventView, player2: EventView)
 
@@ -67,9 +70,32 @@ class GameController(gameMechanics: GameMechanics) {
   }
 
   def playerAction(player: Player.Value, action: GameAction): Seq[BothSideEventView] = {
-    gameMechanics.handleAction(player, action)
+    val historyEvent = gameMechanics.handleAction(player, action)
+    historyEvent match {
+      case Some(event) => buildBothSideView(event)
+      case None =>
+        Console.out.println("Invalid action", action)
+        Seq.empty
+    }
+  }
 
-    Seq.empty
+  private def buildBothSideView(event: HistoryEvent): Seq[BothSideEventView] = {
+    event.effects.map(effect =>
+      BothSideEventView(
+        buildBothSideView(effect, true),
+        buildBothSideView(effect, false)))
+  }
+
+  private def buildBothSideView(effect: HistoryEffect, isPlayer: Boolean): EventView = {
+    effect match {
+      case MulliganCardEffect(uniqueId) => MulliganEffectView(buildCardView(uniqueId))
+      case DrawCardEffect(uniqueId) => DrawCardEffectView(buildCardView(uniqueId))
+    }
+  }
+
+  private def buildCardView(uniqueId: Int): CardView = {
+    // TODO
+    CardView(uniqueId, CardId(CardSet.TwoPlayersGame, 1))
   }
 
   def getFullState(player: Player.Value): GameState = {

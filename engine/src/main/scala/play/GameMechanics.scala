@@ -39,6 +39,8 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
   val areaPlayer1: PlayerArea = initPlayerArea(Player.Player1, deckPlayer1, 100)
   val areaPlayer2: PlayerArea = initPlayerArea(Player.Player2, deckPlayer2, 200)
 
+  val gameHistory: GameHistory = new GameHistory
+
   var currentRoundHistory = HistoryRound(Seq.empty, Seq.empty, Seq.empty)
 
   def initPlayerArea(player: Player.Value, deck: FullDeck, startId: Int): PlayerArea = {
@@ -74,15 +76,14 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
 
     val validAction = action.phase == phase &&
       (phase match {
-        case GamePhase.Action => {
-          player == currentPlayer
-        }
+        case GamePhase.Action => player == currentPlayer
+        case _ => true
       }) &&
-      action.isValid(playerArea, opponentArea, currentRoundHistory.actions.lastOption.map(_.events).getOrElse(Seq.empty).map(_.action))
+      action.isValid(player, playerArea, opponentArea, gameHistory)
 
     if (!validAction) return None
 
-    val event = action.process(playerArea, opponentArea)
+    val event = action.process(player, playerArea, opponentArea)
     currentRoundHistory = HistoryRound(currentRoundHistory.actions :+ HistoryTurn(Seq(event)), Seq.empty, Seq.empty)
 
     // Post action
@@ -101,13 +102,14 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
           // end of the turn
           if (opponentArea.battlefieldClaimed) {
             val automaticPassAction = PassAction()
-            val passEvent = automaticPassAction.process(opponentArea, playerArea)
+            val passEvent = automaticPassAction.process(player.opponent, opponentArea, playerArea)
             currentRoundHistory = HistoryRound(currentRoundHistory.actions :+ HistoryTurn(Seq(passEvent)), Seq.empty, Seq.empty)
           } else {
             currentPlayer = currentPlayer.opponent
           }
         }
       }
+      case _ =>
     }
 
     Some(event)

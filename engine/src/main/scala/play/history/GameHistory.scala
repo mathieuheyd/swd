@@ -1,5 +1,5 @@
 package play.history
 
-class GameHistory(setup: Seq[HistoryEffect],
-                  mulligan: Seq[HistoryEvent],
-                  rounds: Seq[HistoryRound])
+class GameHistory() {
+  var mulliganActions: Seq[HistoryEvent] = Seq.empty
+}

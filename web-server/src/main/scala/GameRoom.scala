@@ -1,7 +1,7 @@
 import akka.actor._
 import collection.{StarterKyloRen, StarterRey}
-import play.{GameAction, GameMechanics}
-import view.{EventView, GameController}
+import play.{GameAction, GameMechanics, Player}
+import view.{BothSideEventView, EventView, GameController}
 
 object GameRoom {
   case object Join
@@ -33,20 +33,32 @@ class GameRoom(player1: String, player2: String) extends Actor {
       if (actorPlayer1.contains(user)) actorPlayer1 = None
       if (actorPlayer2.contains(user)) actorPlayer2 = None
 
-    case msg: ChatMessage =>
-      Seq(actorPlayer1, actorPlayer2).flatten.foreach(_ ! msg)
+    case chatMessage: ChatMessage =>
+      Seq(actorPlayer1, actorPlayer2).flatten.foreach(_ ! chatMessage)
+
+    case actionMessage: PlayerActionMessage =>
+      val events = controller.playerAction(sendingPlayer(sender()), actionMessage.action)
+      sendBothEvents(events)
   }
 
-  def startGame() = {
-    Console.out.println(actorPlayer1)
-    Console.out.println(actorPlayer2)
+  private def startGame() = {
     actorPlayer1.get ! GameStart(player1, player2)
     actorPlayer2.get ! GameStart(player2, player1)
 
     val setupEvents = controller.startGame()
-    setupEvents.foreach { bothSideEvent =>
+    sendBothEvents(setupEvents)
+  }
+
+  private def sendBothEvents(eventsView: Seq[BothSideEventView]) = {
+    eventsView.foreach { bothSideEvent =>
       actorPlayer1.get ! EventViewMessage(bothSideEvent.player1)
       actorPlayer2.get ! EventViewMessage(bothSideEvent.player2)
     }
+  }
+
+  private def sendingPlayer(sender: ActorRef): Player.Value = {
+    if (actorPlayer1.contains(sender)) return Player.Player1
+    if (actorPlayer2.contains(sender)) return Player.Player2
+    throw new Exception("Invalid sender")
   }
 }

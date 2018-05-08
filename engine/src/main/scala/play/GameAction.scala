@@ -8,16 +8,17 @@ import scala.collection.mutable
 sealed trait GameAction {
   val phase: GamePhase.Value
 
-  def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean
-  def process(playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent
+  def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean
+  def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent
 }
 
 case class MulliganAction(cards: List[Int]) extends GameAction {
   override val phase = GamePhase.Mulligan
-  override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean = {
+  override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
+    !history.mulliganActions.exists(event => event.player == player) &&
     cards.forall(id => playerArea.getCardInHand(id).isDefined)
   }
-  override def process(playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent = {
+  override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent = {
     val effects = mutable.Buffer.empty[HistoryEffect]
 
     if (cards.nonEmpty) {
@@ -32,16 +33,16 @@ case class MulliganAction(cards: List[Int]) extends GameAction {
       drawCards.map(c => effects += DrawCardEffect(c.uniqueId))
     }
 
-    HistoryEvent(this, effects)
+    HistoryEvent(player, this, effects)
   }
 }
 
 case class MulliganUpkeepAction(cardsToMulligan: List[Int]) extends GameAction {
   override val phase = GamePhase.Upkeep
-  override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean = {
+  override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
     cardsToMulligan.forall(id => playerArea.getCardInHand(id).isDefined)
   }
-  override def process(playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent = {
+  override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent = {
     val effects = mutable.Buffer.empty[HistoryEffect]
 
     if (cardsToMulligan.nonEmpty) {
@@ -61,27 +62,27 @@ case class MulliganUpkeepAction(cardsToMulligan: List[Int]) extends GameAction {
       }
     }
 
-    HistoryEvent(this, effects)
+    HistoryEvent(player, this, effects)
   }
 }
 
 case class PassAction() extends GameAction {
   override val phase = GamePhase.Action
-  override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean = {
+  override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
     true
   }
-  override def process(playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent = {
-    HistoryEvent(this, Seq.empty)
+  override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent = {
+    HistoryEvent(player, this, Seq.empty)
   }
 }
 
 case class ActivateAction(card: Int) extends GameAction {
   override val phase = GamePhase.Action
-  override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean = {
+  override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
     val character = playerArea.getCharacterOrSupport(card)
     return character.isDefined && !character.get.isActivated
   }
-  override def process(playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent = {
+  override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent = {
     val effects = mutable.Buffer.empty[HistoryEffect]
 
     val character = playerArea.getCharacterOrSupport(card).get
@@ -95,13 +96,13 @@ case class ActivateAction(card: Int) extends GameAction {
       effects +=  DiceRolledEffect(dice.uniqueId, dice.sideId)
     })
 
-    HistoryEvent(this, effects)
+    HistoryEvent(player, this, effects)
   }
 }
 
 case class ResolveDices(dices: List[Int], targets: List[Int]) extends GameAction {
   override val phase = GamePhase.Action
-  override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean = {
+  override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
     val inPlayDices = dices.map(id => playerArea.getDice(id))
     val areDefined = inPlayDices.forall(d => d.isDefined)
     lazy val areInPool = inPlayDices.forall(d => d.get.inPool)
@@ -124,7 +125,7 @@ case class ResolveDices(dices: List[Int], targets: List[Int]) extends GameAction
     }
     areDefined && areInPool && sameSymbol && atLeastOneNonModifier && enoughResources && validTargets
   }
-  override def process(playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent = {
+  override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent = {
     val effects = mutable.Buffer.empty[HistoryEffect]
 
     val inPlayDices = dices.map(id => playerArea.getDice(id).get)
@@ -181,16 +182,16 @@ case class ResolveDices(dices: List[Int], targets: List[Int]) extends GameAction
       effects += DiceOutPoolEffect(dice.uniqueId)
     })
 
-    HistoryEvent(this, effects)
+    HistoryEvent(player, this, effects)
   }
 }
 
 case class DiscardReroll(card: Int, dice: Int) extends GameAction {
   override val phase = GamePhase.Action
-  override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean = {
+  override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
     playerArea.getCardInHand(card).isDefined && playerArea.getDice(dice).exists(_.inPool)
   }
-  override def process(playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent = {
+  override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent = {
     val effects = mutable.Buffer.empty[HistoryEffect]
 
     val c = playerArea.popCardFromHand(card).get
@@ -201,7 +202,7 @@ case class DiscardReroll(card: Int, dice: Int) extends GameAction {
     d.roll()
     effects += DiceRolledEffect(d.uniqueId, d.sideId)
 
-    HistoryEvent(this, effects)
+    HistoryEvent(player, this, effects)
   }
 }
 
@@ -225,12 +226,12 @@ case class DiscardReroll(card: Int, dice: Int) extends GameAction {
 
 case class ClaimBattlefield() extends GameAction {
   override val phase = GamePhase.Action
-  override def isValid(playerArea: PlayerArea, opponentArea: PlayerArea, previousActions: Seq[GameAction]): Boolean = {
+  override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
     !playerArea.battlefieldClaimed && !opponentArea.battlefieldClaimed
   }
-  override def process(playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent = {
+  override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea): HistoryEvent = {
     val battlefield = Seq(playerArea.battlefield, opponentArea.battlefield).flatten.head
     playerArea.battlefield = Some(battlefield)
-    HistoryEvent(this, Seq.empty)
+    HistoryEvent(player, this, Seq.empty)
   }
 }
