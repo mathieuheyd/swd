@@ -34,7 +34,9 @@ class MatchMaking(gameRouter: ActorRef) extends Actor {
         case None => Nil
         case Some((player1, player2)) => {
           val actor1 = unregister(player1)
+          context.unwatch(actor1)
           val actor2 = unregister(player2)
+          context.unwatch(actor2)
           val newGameId = player1 + player2
           gameRouter ! GameRouter.NewGame(newGameId, actor1, actor2)
         }
