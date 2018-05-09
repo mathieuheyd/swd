@@ -2,6 +2,8 @@ package play
 
 import entities.{Battlefield, Card, Character, Dice, DiceSide}
 
+import scala.util.Random
+
 class InPlayCharacter(val uniqueId: Int, val character: Character, val dices: Array[InPlayDice]) {
   var isActivated = false
   var health = character.maxHealth
@@ -34,7 +36,7 @@ case class InPlayCard(uniqueId: Int, card: Card, dice: Option[InPlayDice])
 
 class Deck(var cards: Seq[InPlayCard]) {
   def shuffle() = {
-
+    cards = Random.shuffle(cards)
   }
   def draw(): InPlayCard = {
     val card = cards.head
