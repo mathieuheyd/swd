@@ -57,7 +57,7 @@ class GameActionSpec extends FlatSpec {
 
     assert(action.isValid(Player.Player1, playerArea, opponentArea, new GameHistory) == true)
 
-    assert(action.process(Player.Player1, playerArea, opponentArea) ==
+    assert(action.process(Player.Player1, playerArea, opponentArea, new GameHistory) ==
       HistoryEvent(Player.Player1, action, Seq(CharacterActivatedEffect(1), DiceInPoolEffect(2), DiceRolledEffect(2, 1))))
   }
 
@@ -146,7 +146,7 @@ class GameActionSpec extends FlatSpec {
     val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
 
     assert(action.isValid(Player.Player1, playerArea, opponentArea, new GameHistory) == true)
-    action.process(Player.Player1, playerArea, opponentArea)
+    action.process(Player.Player1, playerArea, opponentArea, new GameHistory)
 
     assert(playerArea.resources == 1)
   }
@@ -166,7 +166,7 @@ class GameActionSpec extends FlatSpec {
     val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
 
     assert(action.isValid(Player.Player1, playerArea, opponentArea, new GameHistory) == true)
-    action.process(Player.Player1, playerArea, opponentArea)
+    action.process(Player.Player1, playerArea, opponentArea, new GameHistory)
 
     assert(playerArea.resources == 4)
   }

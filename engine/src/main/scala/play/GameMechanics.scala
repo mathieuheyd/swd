@@ -83,7 +83,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
 
     if (!validAction) return None
 
-    val event = action.process(player, playerArea, opponentArea)
+    val event = action.process(player, playerArea, opponentArea, gameHistory)
     currentRoundHistory = HistoryRound(currentRoundHistory.actions :+ HistoryTurn(Seq(event)), Seq.empty, Seq.empty)
 
     // Post action
@@ -102,7 +102,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
           // end of the turn
           if (opponentArea.battlefieldClaimed) {
             val automaticPassAction = PassAction()
-            val passEvent = automaticPassAction.process(player.opponent, opponentArea, playerArea)
+            val passEvent = automaticPassAction.process(player.opponent, opponentArea, playerArea, gameHistory)
             currentRoundHistory = HistoryRound(currentRoundHistory.actions :+ HistoryTurn(Seq(passEvent)), Seq.empty, Seq.empty)
           } else {
             currentPlayer = currentPlayer.opponent

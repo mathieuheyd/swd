@@ -1,5 +1,7 @@
 package play.history
 
+import scala.collection.mutable
+
 class GameHistory() {
-  var mulliganActions: Seq[HistoryEvent] = Seq.empty
+  var mulliganActions: mutable.Buffer[HistoryEvent] = mutable.Buffer.empty
 }
