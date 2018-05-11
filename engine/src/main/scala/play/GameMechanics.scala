@@ -59,14 +59,8 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
   }
 
   def drawStartingHands() = {
-    areaPlayer1.shuffleDeck()
-    areaPlayer2.shuffleDeck()
-
-    val cardsPlayer1 = areaPlayer1.drawCards(5)
-    areaPlayer1.putCardsInHand(cardsPlayer1)
-
-    val cardsPlayer2 = areaPlayer2.drawCards(5)
-    areaPlayer2.putCardsInHand(cardsPlayer2)
+    handleAction(Player.Player1, DrawStartingHand())
+    handleAction(Player.Player2, DrawStartingHand())
 
     phase = GamePhase.Mulligan
   }

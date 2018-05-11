@@ -12,10 +12,29 @@ sealed trait GameAction {
   def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent
 }
 
+case class DrawStartingHand() extends GameAction {
+  override val phase = GamePhase.Setup
+  override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
+    !history.setupActions.exists(event => event.action.isInstanceOf[DrawStartingHand] && event.player == player)
+  }
+  override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
+    val effects = mutable.Buffer.empty[HistoryEffect]
+
+    playerArea.shuffleDeck()
+    val cards = playerArea.drawCards(5)
+    playerArea.putCardsInHand(cards)
+    effects ++= cards.map(card => DrawCardEffect(card.uniqueId))
+
+    val event = HistoryEvent(player, this, effects)
+    history.setupActions += event
+    event
+  }
+}
+
 case class MulliganAction(cards: List[Int]) extends GameAction {
   override val phase = GamePhase.Mulligan
   override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
-    !history.mulliganActions.exists(event => event.player == player) &&
+    !history.setupActions.exists(event => event.action.isInstanceOf[MulliganAction] && event.player == player) &&
     cards.forall(id => playerArea.getCardInHand(id).isDefined)
   }
   override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
@@ -34,7 +53,7 @@ case class MulliganAction(cards: List[Int]) extends GameAction {
     }
 
     val event = HistoryEvent(player, this, effects)
-    history.mulliganActions += event
+    history.setupActions += event
     event
   }
 }
