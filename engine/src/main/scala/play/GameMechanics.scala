@@ -74,7 +74,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
     Seq(events1, events2).flatten
   }
 
-  def handleAction(player: Player.Value, action: GameAction): Option[HistoryEvent] = {
+  def handleAction(player: Player.Value, action: GameAction): Seq[HistoryEvent] = {
     val (playerArea, opponentArea) = if (player == Player.Player1) (areaPlayer1, areaPlayer2) else (areaPlayer2, areaPlayer1)
 
     val validAction = action.phase == phase &&
@@ -84,7 +84,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
       }) &&
       action.isValid(player, playerArea, opponentArea, gameHistory)
 
-    if (!validAction) return None
+    if (!validAction) return Seq.empty
 
     val event = action.process(player, playerArea, opponentArea, gameHistory)
     currentRoundHistory = HistoryRound(currentRoundHistory.actions :+ HistoryTurn(Seq(event)), Seq.empty, Seq.empty)
@@ -115,7 +115,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
       case _ =>
     }
 
-    Some(event)
+    Seq(event)
   }
 
   def upkeepPhase(): Unit = {

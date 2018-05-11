@@ -71,12 +71,7 @@ class GameController(gameMechanics: GameMechanics) {
 
   def playerAction(player: Player.Value, action: GameAction): Seq[BothSideEventView] = {
     val historyEvent = gameMechanics.handleAction(player, action)
-    historyEvent match {
-      case Some(event) => buildBothSideView(event)
-      case None =>
-        Console.out.println("Invalid action", action)
-        Seq.empty
-    }
+    historyEvent.flatMap(event => buildBothSideView(event))
   }
 
   private def buildBothSideView(event: HistoryEvent): Seq[BothSideEventView] = {
