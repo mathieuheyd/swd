@@ -58,6 +58,24 @@ case class MulliganAction(cards: List[Int]) extends GameAction {
   }
 }
 
+case class TossAction() extends GameAction {
+  override val phase = GamePhase.Battlefield
+  override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
+    !history.setupActions.exists(event => event.action.isInstanceOf[TossAction] && event.player == player)
+  }
+  override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
+    val effects = mutable.Buffer.empty[HistoryEffect]
+
+    val dices = playerArea.characters.flatMap(_.dices)
+    dices.foreach { d => d.roll() }
+    effects ++= dices.map(d => DiceRolledEffect(d.uniqueId, d.sideId))
+
+    val event = HistoryEvent(player, this, effects)
+    history.setupActions += event
+    event
+  }
+}
+
 case class MulliganUpkeepAction(cardsToMulligan: List[Int]) extends GameAction {
   override val phase = GamePhase.Upkeep
   override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {

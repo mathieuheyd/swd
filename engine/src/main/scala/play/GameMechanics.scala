@@ -58,11 +58,20 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
     new PlayerArea(player, inPlayCharacters, new Deck(cardsWithId))
   }
 
-  def drawStartingHands() = {
-    handleAction(Player.Player1, DrawStartingHand())
-    handleAction(Player.Player2, DrawStartingHand())
+  def drawStartingHands(): Seq[HistoryEvent] = {
+    val events1 = handleAction(Player.Player1, DrawStartingHand())
+    val events2 = handleAction(Player.Player2, DrawStartingHand())
 
     phase = GamePhase.Mulligan
+
+    Seq(events1, events2).flatten
+  }
+
+  def handleToss(): Seq[HistoryEvent] = {
+    val events1 = handleAction(Player.Player1, TossAction())
+    val events2 = handleAction(Player.Player2, TossAction())
+
+    Seq(events1, events2).flatten
   }
 
   def handleAction(player: Player.Value, action: GameAction): Option[HistoryEvent] = {
@@ -107,20 +116,6 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
     }
 
     Some(event)
-  }
-
-  def rollBattlefieldDecider(): Player.Value = {
-    val dices1 = areaPlayer1.characters.flatMap(_.dices)
-    dices1.foreach { d => d.roll() }
-    val sum1 = dices1.map { _.currentSide.value }.sum
-
-    val dices2 = areaPlayer2.characters.flatMap(_.dices)
-    dices2.foreach { d => d.roll() }
-    val sum2 = dices1.map { _.currentSide.value }.sum
-
-    if (sum1 == sum2) return rollBattlefieldDecider()
-
-    if (sum1 > sum2) Player.Player1 else Player.Player2
   }
 
   def upkeepPhase(): Unit = {
