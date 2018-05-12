@@ -41,8 +41,6 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
 
   val gameHistory: GameHistory = new GameHistory
 
-  var currentRoundHistory = HistoryRound(Seq.empty, Seq.empty, Seq.empty)
-
   def initPlayerArea(player: Player.Value, deck: FullDeck, startId: Int): PlayerArea = {
     val inPlayCharacters = deck.characters.zipWithIndex.map { c =>
       val uniqueId = startId + c._2 * 3
@@ -75,6 +73,8 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
   }
 
   def handleAction(player: Player.Value, action: GameAction): Seq[HistoryEvent] = {
+    var events = mutable.Buffer.empty[HistoryEvent]
+
     val (playerArea, opponentArea) = if (player == Player.Player1) (areaPlayer1, areaPlayer2) else (areaPlayer2, areaPlayer1)
 
     val validAction = action.phase == phase &&
@@ -84,20 +84,21 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
       }) &&
       action.isValid(player, playerArea, opponentArea, gameHistory)
 
-    if (!validAction) return Seq.empty
+    if (!validAction) return events
 
-    val event = action.process(player, playerArea, opponentArea, gameHistory)
-    currentRoundHistory = HistoryRound(currentRoundHistory.actions :+ HistoryTurn(Seq(event)), Seq.empty, Seq.empty)
+    events += action.process(player, playerArea, opponentArea, gameHistory)
 
     // Post action
     phase match {
+      case GamePhase.Mulligan =>
+        if (gameHistory.setupActions.count(event => event.action.isInstanceOf[MulliganAction]) == 2) {
+          phase = GamePhase.Battlefield
+          events ++= handleToss()
+        }
       case GamePhase.Action => {
-        val bothPlayersPass = currentRoundHistory.actions
+        val bothPlayersPass = gameHistory.currentRoundActions
           .takeRight(2)
-          .forall(turn => turn.events.headOption.map(_.action) match {
-            case Some(PassAction()) => true
-            case _ => false
-          })
+          .forall(event => event.action.isInstanceOf[PassAction])
         if (bothPlayersPass) {
           phase = GamePhase.Upkeep
           upkeepPhase()
@@ -105,8 +106,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
           // end of the turn
           if (opponentArea.battlefieldClaimed) {
             val automaticPassAction = PassAction()
-            val passEvent = automaticPassAction.process(player.opponent, opponentArea, playerArea, gameHistory)
-            currentRoundHistory = HistoryRound(currentRoundHistory.actions :+ HistoryTurn(Seq(passEvent)), Seq.empty, Seq.empty)
+            handleAction(player.opponent, automaticPassAction)
           } else {
             currentPlayer = currentPlayer.opponent
           }
@@ -115,7 +115,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
       case _ =>
     }
 
-    Seq(event)
+    events
   }
 
   def upkeepPhase(): Unit = {
@@ -140,8 +140,6 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
 
     areaPlayer2.resources += 2
     effects += ResourceAddedEffect(Player.Player2, 2)
-
-    currentRoundHistory = HistoryRound(currentRoundHistory.actions, effects, Seq.empty)
   }
 
 }

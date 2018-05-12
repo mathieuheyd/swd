@@ -2,7 +2,7 @@ package view
 
 import entities.{Battlefield, CardId, CardSet}
 import play._
-import play.history.{DrawCardEffect, HistoryEffect, HistoryEvent, MulliganCardEffect}
+import play.history._
 
 import scala.collection.mutable
 
@@ -20,11 +20,13 @@ case class PlayerSetupView(characters: List[CharacterView], battlefield: CardId,
 sealed trait EventView
 case class SetupView(player: PlayerSetupView, opponent: PlayerSetupView) extends EventView
 case class DrawStartingHandView(player: List[CardView], opponent: Int) extends EventView
+case class RollBattlefieldView(player: List[DiceView], opponent: List[DiceView])
 
 case class ActionView() extends EventView
 //case class EffectView() extends EventView
 case class MulliganEffectView(card: CardView) extends EventView
 case class DrawCardEffectView(card: CardView) extends EventView
+case class DiceRolledEffectView(dice: DiceView, sideId: Int) extends EventView
 
 case class BothSideEventView(player1: EventView, player2: EventView)
 
@@ -85,12 +87,18 @@ class GameController(gameMechanics: GameMechanics) {
     effect match {
       case MulliganCardEffect(uniqueId) => MulliganEffectView(buildCardView(uniqueId))
       case DrawCardEffect(uniqueId) => DrawCardEffectView(buildCardView(uniqueId))
+      case DiceRolledEffect(uniqueId, sideId) => DiceRolledEffectView(buildDiceView(uniqueId), sideId)
     }
   }
 
   private def buildCardView(uniqueId: Int): CardView = {
     // TODO
     CardView(uniqueId, CardId(CardSet.TwoPlayersGame, 1))
+  }
+
+  private def buildDiceView(uniqueId: Int): DiceView = {
+    // TODO
+    DiceView(uniqueId, CardId(CardSet.TwoPlayersGame, 1))
   }
 
   def getFullState(player: Player.Value): GameState = {
