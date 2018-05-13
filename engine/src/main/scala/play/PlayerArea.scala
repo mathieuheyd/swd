@@ -48,11 +48,15 @@ class Deck(var cards: Seq[InPlayCard]) {
   }
 }
 
+case class InPlayBattlefield(uniqueId: Int, card: Battlefield)
+
 class DiscardPile(val cards: Array[Card]) {}
 
-class PlayerArea(val player: Player.Value, val characters: Array[InPlayCharacter], val deck: Deck) {
+class PlayerArea(val player: Player.Value,
+                 val characters: Array[InPlayCharacter],
+                 val deck: Deck,
+                 var battlefield: Option[InPlayBattlefield]) {
 
-  var battlefield: Option[Battlefield] = None
   var battlefieldClaimed = false
 
   var resources = 0

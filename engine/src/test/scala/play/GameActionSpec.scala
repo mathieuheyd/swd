@@ -35,9 +35,9 @@ class GameActionSpec extends FlatSpec {
 
     val character = new InPlayCharacter(1, Awakenings._1, Array.empty)
     character.isActivated = true
-    val playerArea = new PlayerArea(Player.Player1, Array(character), new Deck(Seq.empty))
+    val playerArea = new PlayerArea(Player.Player1, Array(character), new Deck(Seq.empty), None)
 
-    val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
+    val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty), None)
 
     assert(action.isValid(Player.Player1, playerArea, opponentArea, new GameHistory) == false)
   }
@@ -51,9 +51,10 @@ class GameActionSpec extends FlatSpec {
         1,
         Awakenings._1,
         Array(new InPlayDice(2, Awakenings._1.dice.get)))),
-      new Deck(Seq.empty))
+      new Deck(Seq.empty),
+      None)
 
-    val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
+    val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty), None)
 
     assert(action.isValid(Player.Player1, playerArea, opponentArea, new GameHistory) == true)
 
@@ -70,9 +71,10 @@ class GameActionSpec extends FlatSpec {
         1,
         Awakenings._1,
         Array(new InPlayDice(2, Awakenings._1.dice.get)))),
-      new Deck(Seq.empty))
+      new Deck(Seq.empty),
+      None)
 
-    val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
+    val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty), None)
 
     assert(action.isValid(Player.Player1, playerArea, opponentArea, new GameHistory) == false)
   }
@@ -86,9 +88,10 @@ class GameActionSpec extends FlatSpec {
         1,
         Awakenings._1,
         Array(FakeData.diceOneSide(2, DiceSideSymbol.Resource, inPool = false)))),
-      new Deck(Seq.empty))
+      new Deck(Seq.empty),
+      None)
 
-    val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
+    val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty), None)
 
     assert(action.isValid(Player.Player1, playerArea, opponentArea, new GameHistory) == false)
   }
@@ -104,9 +107,10 @@ class GameActionSpec extends FlatSpec {
         Array(
           FakeData.diceOneSide(2, DiceSideSymbol.Resource, inPool = true),
           FakeData.diceOneSide(3, DiceSideSymbol.Disrupt, inPool = true)))),
-      new Deck(Seq.empty))
+      new Deck(Seq.empty),
+      None)
 
-    val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
+    val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty), None)
 
     assert(action.isValid(Player.Player1, playerArea, opponentArea, new GameHistory) == false)
   }
@@ -122,9 +126,10 @@ class GameActionSpec extends FlatSpec {
         Array(
           FakeData.diceOneSide(2, DiceSideSymbol.Resource, inPool = true, modifier = true),
           FakeData.diceOneSide(3, DiceSideSymbol.Resource, inPool = true, modifier = true)))),
-      new Deck(Seq.empty))
+      new Deck(Seq.empty),
+      None)
 
-    val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
+    val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty), None)
 
     assert(action.isValid(Player.Player1, playerArea, opponentArea, new GameHistory) == false)
   }
@@ -140,10 +145,11 @@ class GameActionSpec extends FlatSpec {
         Array(
           FakeData.diceOneSide(2, DiceSideSymbol.Disrupt, cost = 1, inPool = true),
           FakeData.diceOneSide(3, DiceSideSymbol.Disrupt, cost = 2, inPool = true)))),
-      new Deck(Seq.empty))
+      new Deck(Seq.empty),
+      None)
     playerArea.resources = 4
 
-    val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
+    val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty), None)
 
     assert(action.isValid(Player.Player1, playerArea, opponentArea, new GameHistory) == true)
     action.process(Player.Player1, playerArea, opponentArea, new GameHistory)
@@ -160,10 +166,11 @@ class GameActionSpec extends FlatSpec {
         1,
         Awakenings._1,
         Array(FakeData.diceOneSide(2, DiceSideSymbol.Resource, value = 3, inPool = true)))),
-      new Deck(Seq.empty))
+      new Deck(Seq.empty),
+      None)
     playerArea.resources = 1
 
-    val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty))
+    val opponentArea = new PlayerArea(Player.Player2, Array.empty, new Deck(Seq.empty), None)
 
     assert(action.isValid(Player.Player1, playerArea, opponentArea, new GameHistory) == true)
     action.process(Player.Player1, playerArea, opponentArea, new GameHistory)

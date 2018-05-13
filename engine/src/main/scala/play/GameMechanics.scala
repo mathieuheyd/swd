@@ -31,6 +31,15 @@ object GamePhase extends Enumeration {
   val Setup, Mulligan, Battlefield, Action, Upkeep = Value
 }
 
+case class UniqueIdGenerator(val startId: Int) {
+  var currentId = startId
+  def next() = {
+    val id = currentId
+    currentId += 1
+    id
+  }
+}
+
 class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
 
   var phase: GamePhase = GamePhase.Setup
@@ -42,18 +51,20 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
   val gameHistory: GameHistory = new GameHistory
 
   def initPlayerArea(player: Player.Value, deck: FullDeck, startId: Int): PlayerArea = {
+    val id = UniqueIdGenerator(startId)
     val inPlayCharacters = deck.characters.zipWithIndex.map { c =>
-      val uniqueId = startId + c._2 * 3
-      val firstDice = new InPlayDice(uniqueId + 1, c._1.character.dice.get)
-      val dices = if (c._1.elite) Array(firstDice, new InPlayDice(uniqueId + 2, c._1.character.dice.get)) else Array(firstDice)
-      new InPlayCharacter(uniqueId, c._1.character, dices)
+      val characterId = id.next
+      val firstDice = new InPlayDice(id.next, c._1.character.dice.get)
+      val dices = if (c._1.elite) Array(firstDice, new InPlayDice(id.next, c._1.character.dice.get)) else Array(firstDice)
+      new InPlayCharacter(characterId, c._1.character, dices)
     }
     val cardsWithId = deck.deck.zipWithIndex.map { c =>
-      val uniqueId = startId + deck.characters.length * 3 + c._2 * 2
-      val dice = c._1.dice.map { d => new InPlayDice(uniqueId = 1, d) }
-      InPlayCard(uniqueId, c._1, dice)
+      val cardId = id.next
+      val dice = c._1.dice.map { d => new InPlayDice(id.next, d) }
+      InPlayCard(cardId, c._1, dice)
     }
-    new PlayerArea(player, inPlayCharacters, new Deck(cardsWithId))
+    val battlefield = InPlayBattlefield(id.next, deck.battlefield)
+    new PlayerArea(player, inPlayCharacters, new Deck(cardsWithId), Some(battlefield))
   }
 
   def drawStartingHands(): Seq[HistoryEvent] = {
@@ -94,6 +105,11 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
         if (gameHistory.setupActions.count(event => event.action.isInstanceOf[MulliganAction]) == 2) {
           phase = GamePhase.Battlefield
           events ++= handleToss()
+        }
+      case GamePhase.Battlefield =>
+        if (gameHistory.setupActions.exists(event => event.action.isInstanceOf[ChooseBattlefield])) {
+          // TODO prepare game history for new round
+          phase = GamePhase.Action
         }
       case GamePhase.Action => {
         val bothPlayersPass = gameHistory.currentRoundActions

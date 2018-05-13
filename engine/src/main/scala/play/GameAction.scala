@@ -76,6 +76,42 @@ case class TossAction() extends GameAction {
   }
 }
 
+case class ChooseBattlefield(card: Int) extends GameAction {
+  override val phase = GamePhase.Battlefield
+  override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
+    history.setupActions.count(event => event.action.isInstanceOf[TossAction]) % 2 == 0 &&
+    !history.setupActions.exists(event => event.action.isInstanceOf[ChooseBattlefield]) &&
+    playerArea.characters.flatMap(_.dices.map(_.currentSide.value)).sum > opponentArea.characters.flatMap(_.dices.map(_.currentSide.value)).sum &&
+    (playerArea.battlefield.exists(_.uniqueId == card) || opponentArea.battlefield.exists(_.uniqueId == card))
+  }
+  override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
+    if (!playerArea.battlefield.exists(_.uniqueId == card)) {
+      playerArea.battlefield = None
+    }
+    if (!opponentArea.battlefield.exists(_.uniqueId == card)) {
+      opponentArea.battlefield = None
+    }
+
+    val effect = BattlefieldClaimed(card)
+    HistoryEvent(player, this, Seq(effect))
+  }
+}
+
+case class AddShield(card: Int) extends GameAction {
+  override val phase = GamePhase.Battlefield
+  override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
+    history.setupActions.exists(event => event.action.isInstanceOf[ChooseBattlefield]) &&
+    playerArea.battlefield.isEmpty &&
+    history.setupActions.count(event => event.action.isInstanceOf[AddShield]) < 2 &&
+    playerArea.getCharacterOrSupport(card).isDefined
+  }
+  override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
+    playerArea.getCharacterOrSupport(card).get.shields += 1
+
+    HistoryEvent(player, this, Seq(ShiedAddedEffect(card, 1)))
+  }
+}
+
 case class MulliganUpkeepAction(cardsToMulligan: List[Int]) extends GameAction {
   override val phase = GamePhase.Upkeep
   override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
@@ -193,7 +229,7 @@ case class ResolveDices(dices: List[Int], targets: List[Int]) extends GameAction
         playerArea.resources += totalValue
         effects += ResourceAddedEffect(playerArea.player, totalValue)
       case DiceSideSymbol.Shield =>
-        val target = opponentArea.getCharacterOrSupport(targets.head).get
+        val target = playerArea.getCharacterOrSupport(targets.head).get
         val shieldsAdded = Math.min(3 - target.shields, totalValue)
         effects += ShiedAddedEffect(target.uniqueId, shieldsAdded)
       case DiceSideSymbol.Disrupt =>
