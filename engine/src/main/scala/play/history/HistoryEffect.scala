@@ -17,4 +17,4 @@ case class ResourceRemovedEffect(player: Player.Value, amount: Int) extends Hist
 case class CardDiscardedEffect(uniqueId: Int) extends HistoryEffect
 case class MulliganCardEffect(uniqueId: Int) extends HistoryEffect
 case class DrawCardEffect(uniqueId: Int) extends HistoryEffect
-case class BattlefieldClaimed(uniqueId: Int) extends HistoryEffect
+case class BattlefieldChosenEffect(uniqueId: Int) extends HistoryEffect

@@ -42,6 +42,9 @@
       function chooseBattefield(card) {
         return '{"ActionUserMessage":{"action":{"ChooseBattlefield":{"card":' + card + '}}}}';
       }
+      function addShield(card) {
+        return '{"ActionUserMessage":{"action":{"AddShield":{"card":' + card + '}}}}';
+      }
     </script>
   </head>
   <body>
@@ -54,7 +57,7 @@
     </br>
     <textarea id="history" readonly="readonly" cols="100" rows="25"></textarea>
     </br>
-    <input type=="text" id="message" />
+    <input type="text" id="message" />
     <button onclick="sendMessage(document.getElementById('message').value)">Send Message</button>
   </body>
 </html>

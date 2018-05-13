@@ -95,7 +95,10 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
       }) &&
       action.isValid(player, playerArea, opponentArea, gameHistory)
 
-    if (!validAction) return events
+    if (!validAction) {
+      Console.out.println("Invalid action", player, action)
+      return events
+    }
 
     events += action.process(player, playerArea, opponentArea, gameHistory)
 

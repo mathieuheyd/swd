@@ -92,8 +92,10 @@ case class ChooseBattlefield(card: Int) extends GameAction {
       opponentArea.battlefield = None
     }
 
-    val effect = BattlefieldClaimed(card)
-    HistoryEvent(player, this, Seq(effect))
+    val effect = BattlefieldChosenEffect(card)
+    val event = HistoryEvent(player, this, Seq(effect))
+    history.setupActions += event
+    event
   }
 }
 
@@ -108,7 +110,9 @@ case class AddShield(card: Int) extends GameAction {
   override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
     playerArea.getCharacterOrSupport(card).get.shields += 1
 
-    HistoryEvent(player, this, Seq(ShiedAddedEffect(card, 1)))
+    val event = HistoryEvent(player, this, Seq(ShiedAddedEffect(card, 1)))
+    history.setupActions += event
+    event
   }
 }
 
