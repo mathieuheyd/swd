@@ -1,6 +1,9 @@
+import java.net.{HttpURLConnection, URL}
+
 import akka.NotUsed
 import akka.actor._
 import akka.http.scaladsl._
+import akka.http.scaladsl.model.{HttpEntity, HttpResponse, MediaTypes, StatusCodes}
 import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.http.scaladsl.server.Directives._
 import akka.stream._
@@ -73,6 +76,21 @@ object GameServer {
       } ~
       pathPrefix("client") {
         getFromResourceDirectory("client")
+      } ~
+      pathPrefix("cards") {
+        path(Remaining) { remaining =>
+          get {
+            val url = new URL("http://swdestinydb.com/bundles/cards/" + remaining)
+            val connection = url.openConnection().asInstanceOf[HttpURLConnection]
+            connection.setRequestMethod("GET")
+            val in = connection.getInputStream
+            val byteArray = Stream.continually(in.read).takeWhile(-1 !=).map(_.toByte).toArray
+            complete(HttpResponse(
+              StatusCodes.OK,
+              entity = HttpEntity(MediaTypes.`image/jpeg`, byteArray)
+            ))
+          }
+        }
       }
 
     val binding = Await.result(Http().bindAndHandle(route, "127.0.0.1", 8080), 3.seconds)

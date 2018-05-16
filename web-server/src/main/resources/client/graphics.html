@@ -39,6 +39,18 @@ function addContainer(x, y, w, h, color) {
   app.stage.addChild(container);
   return container;
 }
+
+function cardSprite(cardSet, cardId) {
+  var set = cardSet.toString().padStart(2, '0');
+  var id = cardId.toString().padStart(3, '0');
+  var url = '/cards/en/' + set + '/' + set + id + '.jpg';
+  var sprite = new PIXI.Sprite.fromImage(url);
+  sprite.width = 70;
+  sprite.height = 100;
+  return sprite;
+}
+
+playerHand.addChild(cardSprite(6, 1))
   </script>
 </body>
 </html>
