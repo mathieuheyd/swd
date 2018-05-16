@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SWD</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.7.3/pixi.min.js"></script>
+</head>
+<body>
+  <script type="text/javascript">
+var app = new PIXI.Application(800, 600, {backgroundColor : 0x1099bb});
+document.body.appendChild(app.view);
+
+var opponentBattlefield = addContainer(0, 0, 150, 100, 0x0000bb);
+var opponentHand = addContainer(250, 0, 300, 100, 0x0000ff);
+var opponentResources = addContainer(650, 0, 150, 100, 0x0000aa);
+var opponentSupports = addContainer(0, 100, 150, 200, 0x0000dd);
+var opponentCharacters = addContainer(150, 100, 500, 200, 0x0000ee);
+var opponentDeck = addContainer(650, 100, 150, 200, 0x0000cc);
+
+var playerBattlefield = addContainer(0, 500, 150, 100, 0xbb0000);
+var playerHand = addContainer(250, 500, 300, 100, 0xff0000);
+var payerResources = addContainer(650, 500, 150, 100, 0xaa0000);
+var playerSupports = addContainer(0, 300, 150, 200, 0xdd0000);
+var playerCharacters = addContainer(150, 300, 500, 200, 0xee0000);
+var playerDeck = addContainer(650, 300, 150, 200, 0xcc0000);
+
+function addContainer(x, y, w, h, color) {
+  var container = new PIXI.Container();
+  container.x = x;
+  container.y = y;
+  container.width = w;
+  container.height = h;
+  var background = new PIXI.Sprite(PIXI.Texture.WHITE);
+  background.width = w;
+  background.height = h;
+  background.tint = color;
+  background.alpha = 0.4;
+  container.addChild(background);
+  app.stage.addChild(container);
+  return container;
+}
+  </script>
+</body>
+</html>
