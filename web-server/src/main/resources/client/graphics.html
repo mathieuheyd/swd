@@ -50,7 +50,64 @@ function cardSprite(cardSet, cardId) {
   return sprite;
 }
 
-playerHand.addChild(cardSprite(6, 1))
+function displayCharacters(characters) {
+  var xOffset = 0;
+  characters.forEach(function(c) {
+    console.log(c);
+    var sprite = cardSprite(1, c.card.id);
+    sprite.x = xOffset;
+    xOffset += 210;
+    playerCharacters.addChild(sprite);
+  });
+}
+
+function displayHand(cards) {
+  var xOffset = 0;
+  cards.forEach(function(c) {
+    console.log(c);
+    var sprite = cardSprite(1, c.card.id);
+    sprite.x = xOffset;
+    xOffset += 70;
+    playerHand.addChild(sprite);
+  });
+}
+
+function handleMessage(message) {
+  if (message.hasOwnProperty('SetupView')) {
+    displayCharacters(message.SetupView.player.characters);
+  } else if (message.hasOwnProperty('DrawStartingHandView')) {
+    displayHand(message.DrawStartingHandView.player);
+  }
+}
+
+function findGame(name) {
+  var match = new WebSocket("ws://localhost:8080/match");
+  match.onopen = function() {
+    console.log('Connected to Match Making');
+    match.send(name);
+  }
+  match.onclose = function() { console.log('Connection to Match Making closed') }
+  match.onmessage = function(message) {
+    console.log('New game found:', message.data);
+    initGame(message.data);
+  }
+  window.onbeforeunload = function() { match.close() }
+}
+var gameSocket;
+function initGame(id) {
+  gameSocket = new WebSocket("ws://localhost:8080/game/" + id);
+  gameSocket.onopen = function() { console.log('Connected to Game') }
+  gameSocket.onclose = function() { console.log('Connection to Game closed') }
+  gameSocket.onmessage = function(message) {
+    console.log('New message:', message.data);
+    handleMessage(JSON.parse(message.data));
+  }
+  window.onbeforeunload = function() { gameSocket.close() }
+}
+function sendMessage(message) {
+  gameSocket.send(message);
+}
+findGame('player' + Math.round(Math.random() * 100000));
   </script>
 </body>
 </html>
