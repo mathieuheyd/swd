@@ -40,20 +40,24 @@ function addContainer(x, y, w, h, color) {
   return container;
 }
 
-function cardSprite(cardSet, cardId) {
+function cardSprite(cardSet, cardId, horizontal) {
   var set = cardSet.toString().padStart(2, '0');
   var id = cardId.toString().padStart(3, '0');
   var url = '/cards/en/' + set + '/' + set + id + '.jpg';
   var sprite = new PIXI.Sprite.fromImage(url);
-  sprite.width = 70;
-  sprite.height = 100;
+  if (horizontal) {
+    sprite.width = 100;
+    sprite.height = 70;
+  } else {
+    sprite.width = 70;
+    sprite.height = 100;
+  }
   return sprite;
 }
 
 function displayCharacters(characters) {
   var xOffset = 0;
   characters.forEach(function(c) {
-    console.log(c);
     var sprite = cardSprite(1, c.card.id);
     sprite.x = xOffset;
     xOffset += 210;
@@ -61,10 +65,19 @@ function displayCharacters(characters) {
   });
 }
 
+function displayOpponentCharacters(characters) {
+  var xOffset = 0;
+  characters.forEach(function(c) {
+    var sprite = cardSprite(1, c.card.id);
+    sprite.x = xOffset;
+    xOffset += 210;
+    opponentCharacters.addChild(sprite);
+  });
+}
+
 function displayHand(cards) {
   var xOffset = 0;
   cards.forEach(function(c) {
-    console.log(c);
     var sprite = cardSprite(1, c.card.id);
     sprite.x = xOffset;
     xOffset += 70;
@@ -72,9 +85,22 @@ function displayHand(cards) {
   });
 }
 
+function displayBattlefield(card) {
+  var sprite = cardSprite(1, card.card.id, true);
+  playerBattlefield.addChild(sprite);
+}
+
+function displayOpponentBattlefield(card) {
+  var sprite = cardSprite(1, card.card.id, true);
+  opponentBattlefield.addChild(sprite);
+}
+
 function handleMessage(message) {
   if (message.hasOwnProperty('SetupView')) {
     displayCharacters(message.SetupView.player.characters);
+    displayOpponentCharacters(message.SetupView.opponent.characters);
+    displayBattlefield(message.SetupView.player.battlefield);
+    displayOpponentBattlefield(message.SetupView.opponent.battlefield);
   } else if (message.hasOwnProperty('DrawStartingHandView')) {
     displayHand(message.DrawStartingHandView.player);
   }
