@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "system",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "outFile": "../../../target/scala-2.12/classes/client/app.js",
+    "sourceMap": true
+  },
+  "include": [
+    "Application.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
+}
