@@ -1,6 +1,6 @@
 package view
 
-import entities.{Battlefield, CardId, CardSet}
+import entities.{CardId, CardSet}
 import play._
 import play.history._
 

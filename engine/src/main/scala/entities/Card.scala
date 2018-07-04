@@ -2,7 +2,10 @@ package entities
 
 object CardSet extends Enumeration {
   type CardSet = Value
-  val Awakenings, SpiritOfRebellion, EmpireAtWar, TwoPlayersGame = Value
+  val Awakenings = Value(1)
+  val SpiritOfRebellion = Value(2)
+  val EmpireAtWar = Value(3)
+  val TwoPlayersGame = Value(4)
 }
 
 case class CardId(set: CardSet.Value, id: Int)

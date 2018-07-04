@@ -25,7 +25,7 @@ object GameUser {
       ("opponent_name" := gameStart.playerName) ->: jEmptyObject)
 
   implicit def CardSetEncodeJson: EncodeJson[CardSet.CardSet] = EncodeJson({
-    case value => value.toString.asJson
+    case value => value.id.asJson
   })
 
   val eventViewEncoder = EncodeJson.of[EventView]

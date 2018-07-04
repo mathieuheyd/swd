@@ -2,9 +2,12 @@
 
 class Game {
   socket: WebSocket;
-  view: PIXI.Container;
+  view: GameInterface;
+  board: BoardState;
 
   constructor(gameId: string, gameView: GameInterface) {
+    this.view = gameView;
+
     this.socket = new WebSocket("ws://localhost:8080/game/" + gameId);
     this.socket.onopen = (event: Event) => {
       console.log('Connected to Game');
@@ -26,20 +29,23 @@ class Game {
   }
 
   handleMessage(message: EventView) {
+    /*
     if (message instanceof SetupView) {
       console.log('SetupView', message);
+      let setupView: SetupView = message;
+      this.view.setupCharacters(setupView.player.characters, setupView.opponent.characters);
     } else if (message instanceof DrawStartingHandView) {
       console.log('DrawStartingHandView', message);
     } else {
       console.log('Unknown EventView', message);
+
     }
+    */
+    console.log('new EventView', message);
+    message.updateInterface(this.view);
   }
 }
 
-class CardId {
-  set: Number;
-  id: Number;
-}
 class CharacterView {
   uniqueId: Number;
   card: CardId;
@@ -59,14 +65,21 @@ class PlayerSetupView {
   deckSize: Number;
 }
 
-interface EventView {}
+interface EventView {
+  updateInterface(view: GameInterface): void;
+}
 class SetupView implements EventView {
   player: PlayerSetupView;
   opponent: PlayerSetupView;
+
+  updateInterface(view: GameInterface) {
+    view.setupGame(this.player.characters, this.opponent.characters);
+  }
 }
 class DrawStartingHandView implements EventView {
-  constructor(private DrawStartingHandView: {
-    player: Array<CardView>;
-    opponent: Number;
-  }) {}
+  player: Array<CardView>;
+  opponent: Number;
+
+  updateInterface(view: GameInterface) {
+  }
 }
