@@ -73,7 +73,7 @@ class SetupView implements EventView {
   opponent: PlayerSetupView;
 
   updateInterface(view: GameInterface) {
-    view.setupGame(this.player.characters, this.opponent.characters);
+    view.setupGame(this.player.characters, this.player.battlefield, this.opponent.characters, this.opponent.battlefield);
   }
 }
 class DrawStartingHandView implements EventView {
@@ -81,5 +81,8 @@ class DrawStartingHandView implements EventView {
   opponent: Number;
 
   updateInterface(view: GameInterface) {
+    for (let c of this.player) {
+      view.playerHand.addCard(c);
+    }
   }
 }

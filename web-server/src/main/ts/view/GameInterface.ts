@@ -1,15 +1,15 @@
 /// <reference path="../reference.ts" />
 
 class GameInterface extends PIXI.Container {
-  private opponentBattlefield: PIXI.Container = this.addContainer(0, 0, 150, 100, 0x0000bb);
-  private opponentHand: PIXI.Container = this.addContainer(250, 0, 300, 100, 0x0000ff);
+  opponentBattlefield: BattlefieldInterface;
+  opponentHand: HandInterface;
   private opponentResources: PIXI.Container = this.addContainer(650, 0, 150, 100, 0x0000aa);
   private opponentSupports: PIXI.Container = this.addContainer(0, 100, 150, 200, 0x0000dd);
   opponentCharacters: CharactersInterface;
   private opponentDeck: PIXI.Container = this.addContainer(650, 100, 150, 200, 0x0000cc);
 
-  private playerBattlefield: PIXI.Container = this.addContainer(0, 500, 150, 100, 0xbb0000);
-  private playerHand: PIXI.Container = this.addContainer(250, 500, 300, 100, 0xff0000);
+  playerBattlefield: BattlefieldInterface;
+  playerHand: HandInterface;
   private payerResources: PIXI.Container = this.addContainer(650, 500, 150, 100, 0xaa0000);
   private playerSupports: PIXI.Container = this.addContainer(0, 300, 150, 200, 0xdd0000);
   playerCharacters: CharactersInterface;
@@ -31,7 +31,8 @@ class GameInterface extends PIXI.Container {
     return container;
   }
 
-  setupGame(playerCharacters: Array<CharacterView>, opponentCharacters: Array<CharacterView>) {
+  setupGame(playerCharacters: Array<CharacterView>, playerBattlefield: CardView,
+            opponentCharacters: Array<CharacterView>, opponentBattlefield: CardView) {
     this.playerCharacters = new CharactersInterface(playerCharacters);
     this.playerCharacters.x = 150;
     this.playerCharacters.y = 300;
@@ -39,12 +40,40 @@ class GameInterface extends PIXI.Container {
     this.playerCharacters.height = 200;
     this.addChild(this.playerCharacters);
 
+    this.playerBattlefield = new BattlefieldInterface(playerBattlefield);
+    this.playerBattlefield.x = 0;
+    this.playerBattlefield.y = 500;
+    this.playerBattlefield.width = 150;
+    this.playerBattlefield.height = 100;
+    this.addChild(this.playerBattlefield);
+
+    this.playerHand = new HandInterface();
+    this.playerHand.x = 250;
+    this.playerHand.y = 500;
+    this.playerHand.width = 300;
+    this.playerHand.height = 100;
+    this.addChild(this.playerHand);
+
     this.opponentCharacters = new CharactersInterface(opponentCharacters);
     this.opponentCharacters.x = 150;
     this.opponentCharacters.y = 100;
     this.opponentCharacters.width = 500;
     this.opponentCharacters.height =  200;
     this.addChild(this.opponentCharacters);
+
+    this.opponentBattlefield = new BattlefieldInterface(opponentBattlefield);
+    this.opponentBattlefield.x = 0;
+    this.opponentBattlefield.y = 0;
+    this.opponentBattlefield.width = 150;
+    this.opponentBattlefield.height = 100;
+    this.addChild(this.opponentBattlefield);
+
+    this.opponentHand = new HandInterface();
+    this.opponentHand.x = 250;
+    this.opponentHand.y = 0;
+    this.opponentHand.width = 300;
+    this.opponentHand.height = 100;
+    this.addChild(this.opponentHand);
   }
 
 }

@@ -3,6 +3,7 @@
 /// <reference path="Game.ts" />
 /// <reference path="MatchMaking.ts" />
 
+/// <reference path="view/BattlefieldInterface.ts" />
 /// <reference path="view/CardInterface.ts" />
 /// <reference path="view/CharacterInterface.ts" />
 /// <reference path="view/CharactersInterface.ts" />

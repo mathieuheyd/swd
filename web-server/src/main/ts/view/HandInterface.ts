@@ -13,8 +13,13 @@ class HandInterface extends PIXI.Container {
     this.cards.push(card);
 
     this.removeChildren();
+
+    let offset: number = 0;
     for (let c of this.cards) {
-      this.addChild(new CardInterface(c.card));
+      let cardInterface = new CardInterface(c.card);
+      cardInterface.x = offset;
+      this.addChild(cardInterface);
+      offset += 70;
     }
   }
 
