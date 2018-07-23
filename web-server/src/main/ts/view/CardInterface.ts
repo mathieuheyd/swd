@@ -2,9 +2,12 @@
 
 class CardInterface extends PIXI.Container {
 
-  constructor(card: CardId) {
+  card: CardView;
+
+  constructor(card: CardView) {
     super();
-    this.addChild(this.cardSprite(card.set, card.id, false));
+    this.card = card;
+    this.addChild(this.cardSprite(card.card.set, card.card.id, false));
   }
 
   cardSprite(cardSet: number, cardId : number, horizontal: Boolean) {

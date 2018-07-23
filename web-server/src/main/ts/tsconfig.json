@@ -5,7 +5,9 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "outFile": "../../../target/scala-2.12/classes/client/app.js",
-    "sourceMap": true
+    "sourceMap": true,
+    "target": "es5",
+    "lib": ["es2016", "dom"]
   },
   "include": [
     "Application.ts"

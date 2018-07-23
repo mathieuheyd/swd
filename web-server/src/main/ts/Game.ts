@@ -29,21 +29,19 @@ class Game {
   }
 
   handleMessage(message: EventView) {
-    /*
-    if (message instanceof SetupView) {
-      console.log('SetupView', message);
-      let setupView: SetupView = message;
-      this.view.setupCharacters(setupView.player.characters, setupView.opponent.characters);
-    } else if (message instanceof DrawStartingHandView) {
-      console.log('DrawStartingHandView', message);
-    } else {
-      console.log('Unknown EventView', message);
-
-    }
-    */
     console.log('new EventView', message);
-    message.updateInterface(this.view);
+    message.updateInterface(this);
   }
+
+  startMulligan() {
+    this.view.playerHand.startMulligan();
+    this.view.playerActions.mulliganAction(this.mulligan);
+  }
+
+  mulligan = () => {
+    console.log('Mulligan', this.view.playerHand.cardsToMulligan);
+  }
+
 }
 
 class CharacterView {
@@ -66,23 +64,24 @@ class PlayerSetupView {
 }
 
 interface EventView {
-  updateInterface(view: GameInterface): void;
+  updateInterface(game: Game): void;
 }
 class SetupView implements EventView {
   player: PlayerSetupView;
   opponent: PlayerSetupView;
 
-  updateInterface(view: GameInterface) {
-    view.setupGame(this.player.characters, this.player.battlefield, this.opponent.characters, this.opponent.battlefield);
+  updateInterface(game: Game) {
+    game.view.setupGame(this.player.characters, this.player.battlefield, this.opponent.characters, this.opponent.battlefield);
   }
 }
 class DrawStartingHandView implements EventView {
   player: Array<CardView>;
   opponent: Number;
 
-  updateInterface(view: GameInterface) {
+  updateInterface(game: Game) {
     for (let c of this.player) {
-      view.playerHand.addCard(c);
+      game.view.playerHand.addCard(c);
     }
+    game.startMulligan();
   }
 }

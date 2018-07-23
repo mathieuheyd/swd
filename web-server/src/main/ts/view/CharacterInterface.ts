@@ -4,7 +4,7 @@ class CharacterInterface extends PIXI.Container {
 
   constructor(character: CharacterView) {
     super();
-    this.addChild(new CardInterface(character.card));
+    this.addChild(new CardInterface(character));
   }
 
 }

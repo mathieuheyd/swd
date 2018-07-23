@@ -10,7 +10,8 @@ class GameInterface extends PIXI.Container {
 
   playerBattlefield: BattlefieldInterface;
   playerHand: HandInterface;
-  private payerResources: PIXI.Container = this.addContainer(650, 500, 150, 100, 0xaa0000);
+  //private payerResources: PIXI.Container = this.addContainer(650, 500, 150, 100, 0xaa0000);
+  playerActions: ActionInterface;
   private playerSupports: PIXI.Container = this.addContainer(0, 300, 150, 200, 0xdd0000);
   playerCharacters: CharactersInterface;
   private playerDeck: PIXI.Container = this.addContainer(650, 300, 150, 200, 0xcc0000);
@@ -53,6 +54,13 @@ class GameInterface extends PIXI.Container {
     this.playerHand.width = 300;
     this.playerHand.height = 100;
     this.addChild(this.playerHand);
+
+    this.playerActions = new ActionInterface();
+    this.playerActions.x = 650;
+    this.playerActions.y = 500;
+    this.playerActions.width = 150;
+    this.playerActions.height = 100;
+    this.addChild(this.playerActions);
 
     this.opponentCharacters = new CharactersInterface(opponentCharacters);
     this.opponentCharacters.x = 150;
