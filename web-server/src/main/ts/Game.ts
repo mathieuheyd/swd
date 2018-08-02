@@ -40,6 +40,15 @@ class Game {
 
   mulligan = () => {
     console.log('Mulligan', this.view.playerHand.cardsToMulligan);
+    let cards = this.view.playerHand.cardsToMulligan;
+    let message = { ActionUserMessage: {
+      action: {
+        MulliganAction: {
+          cards: Array.from(cards)
+        }
+      }
+    }};
+    this.socket.send(JSON.stringify(message));
   }
 
 }
@@ -57,6 +66,9 @@ class CardView {
   uniqueId: Number;
   card: CardId;
 }
+class PlayerInfoView {
+  name: String;
+}
 class PlayerSetupView {
   characters: Array<CharacterView>;
   battlefield: CardView;
@@ -65,6 +77,14 @@ class PlayerSetupView {
 
 interface EventView {
   updateInterface(game: Game): void;
+}
+class GameInfoView implements EventView {
+  player: PlayerInfoView;
+  opponent: PlayerInfoView;
+
+  updateInterface(game: Game) {
+
+  }
 }
 class SetupView implements EventView {
   player: PlayerSetupView;
@@ -83,5 +103,21 @@ class DrawStartingHandView implements EventView {
       game.view.playerHand.addCard(c);
     }
     game.startMulligan();
+  }
+}
+class MulliganView implements EventView {
+  mulliganCards: Array<CardView>;
+  drawnCards: Array<CardView>;
+
+  updateInterface(game: Game) {
+
+  }
+}
+class MulliganOpponentView implements EventView {
+  mulliganCards: Number;
+  drawnCards: Number;
+
+  updateInterface(game: Game) {
+
   }
 }

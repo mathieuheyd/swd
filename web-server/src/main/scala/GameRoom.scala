@@ -1,13 +1,12 @@
 import akka.actor._
 import collection.{StarterKyloRen, StarterRey}
-import play.{GameAction, GameMechanics, Player}
-import view.{BothSideEventView, EventView, GameController}
+import play.{GameAction, Player}
+import view.{BothSideEventView, EventView, GameController, PlayerInfo}
 
 object GameRoom {
   case object Join
   case class ChatMessage(message: String)
 
-  case class GameStart(playerName: String, opponentName: String)
   case class EventViewMessage(event: EventView)
 
   case class PlayerActionMessage(action: GameAction)
@@ -18,8 +17,10 @@ class GameRoom(player1: String, player2: String) extends Actor {
 
   var actorPlayer1: Option[ActorRef] = None
   var actorPlayer2: Option[ActorRef] = None
-  val game = new GameMechanics(StarterRey.deck, StarterKyloRen.deck)
-  val controller = new GameController(game)
+  val controller = new GameController(
+    PlayerInfo("Mathieu", StarterRey.deck),
+    PlayerInfo("Laumer", StarterKyloRen.deck)
+  )
 
   def receive = {
     case Join =>
@@ -42,9 +43,6 @@ class GameRoom(player1: String, player2: String) extends Actor {
   }
 
   private def startGame() = {
-    actorPlayer1.get ! GameStart(player1, player2)
-    actorPlayer2.get ! GameStart(player2, player1)
-
     val setupEvents = controller.startGame()
     sendBothEvents(setupEvents)
   }

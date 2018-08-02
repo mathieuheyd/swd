@@ -23,7 +23,7 @@ case class DrawStartingHand() extends GameAction {
     playerArea.shuffleDeck()
     val cards = playerArea.drawCards(5)
     playerArea.putCardsInHand(cards)
-    effects ++= cards.map(card => DrawCardEffect(card.uniqueId))
+    effects += DrawHandEffect(cards.map(_.uniqueId).toList)
 
     val event = HistoryEvent(player, this, effects)
     history.setupActions += event
@@ -40,17 +40,15 @@ case class MulliganAction(cards: List[Int]) extends GameAction {
   override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
     val effects = mutable.Buffer.empty[HistoryEffect]
 
+    var drawnCards: Seq[InPlayCard] = Seq.empty
     if (cards.nonEmpty) {
-      cards.map(id => playerArea.popCardFromHand(id)).foreach(
-        c => {
-          playerArea.putCardInDeck(c.get)
-          effects += MulliganCardEffect(c.get.uniqueId)
-        })
+      cards.map(id => playerArea.popCardFromHand(id)).foreach(c => playerArea.putCardInDeck(c.get))
       playerArea.shuffleDeck()
-      val drawCards = playerArea.drawCards(cards.size)
-      playerArea.putCardsInHand(drawCards)
-      drawCards.map(c => effects += DrawCardEffect(c.uniqueId))
+      drawnCards = playerArea.drawCards(cards.size)
+      playerArea.putCardsInHand(drawnCards)
     }
+
+    effects += MulliganEffect(cards, drawnCards.map(_.uniqueId).toList)
 
     val event = HistoryEvent(player, this, effects)
     history.setupActions += event
@@ -110,7 +108,7 @@ case class AddShield(card: Int) extends GameAction {
   override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
     playerArea.getCharacterOrSupport(card).get.shields += 1
 
-    val event = HistoryEvent(player, this, Seq(ShiedAddedEffect(card, 1)))
+    val event = HistoryEvent(player, this, Seq(ShieldAddedEffect(card, 1)))
     history.setupActions += event
     event
   }
@@ -223,7 +221,7 @@ case class ResolveDices(dices: List[Int], targets: List[Int]) extends GameAction
         val damageDealt = Math.min(totalValue - shieldsRemoved, target.health)
         if (shieldsRemoved > 0) {
           target.shields -= shieldsRemoved
-          effects += ShiedRemovedEffect(target.uniqueId, shieldsRemoved)
+          effects += ShieldRemovedEffect(target.uniqueId, shieldsRemoved)
         }
         if (damageDealt > 0) {
           target.health -= damageDealt
@@ -235,7 +233,7 @@ case class ResolveDices(dices: List[Int], targets: List[Int]) extends GameAction
       case DiceSideSymbol.Shield =>
         val target = playerArea.getCharacterOrSupport(targets.head).get
         val shieldsAdded = Math.min(3 - target.shields, totalValue)
-        effects += ShiedAddedEffect(target.uniqueId, shieldsAdded)
+        effects += ShieldAddedEffect(target.uniqueId, shieldsAdded)
       case DiceSideSymbol.Disrupt =>
         val removedResources = Math.min(opponentArea.resources, totalValue)
         opponentArea.resources -= removedResources
