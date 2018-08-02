@@ -50,7 +50,6 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
 
   val gameHistory: GameHistory = new GameHistory
   var cardIds: Map[Int, CardId] = Map.empty
-  var diceIds: Map[Int, CardId] = Map.empty
 
   def initPlayerArea(player: Player.Value, deck: FullDeck, startId: Int): PlayerArea = {
     val id = UniqueIdGenerator(startId)
@@ -60,7 +59,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
       val dices = if (c._1.elite) Array(firstDice, new InPlayDice(id.next, c._1.character.dice.get)) else Array(firstDice)
 
       cardIds += (characterId -> c._1.character.id)
-      dices.foreach(dice => diceIds += (dice.uniqueId -> c._1.character.id))
+      dices.foreach(dice => cardIds += (dice.uniqueId -> c._1.character.id))
 
       new InPlayCharacter(characterId, c._1.character, dices)
     }
@@ -70,7 +69,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
       val dice = c._1.dice.map { d => new InPlayDice(id.next, d) }
 
       cardIds += (cardId -> c._1.id)
-      dice.foreach(dice => diceIds += (dice.uniqueId -> c._1.id))
+      dice.foreach(dice => cardIds += (dice.uniqueId -> c._1.id))
 
       InPlayCard(cardId, c._1, dice)
     }

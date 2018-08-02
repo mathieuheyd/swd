@@ -86,7 +86,7 @@ class GameController(player1: PlayerInfo, player2: PlayerInfo) {
   }
 
   private def buildDiceView(uniqueId: Int): DiceView = {
-    DiceView(uniqueId, gameMechanics.diceIds(uniqueId))
+    DiceView(uniqueId, gameMechanics.cardIds(uniqueId))
   }
 
   /*
