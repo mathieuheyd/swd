@@ -1,6 +1,6 @@
 package play
 
-import entities.FullDeck
+import entities.{CardId, FullDeck}
 import play.GamePhase.GamePhase
 import play.history._
 
@@ -31,7 +31,7 @@ object GamePhase extends Enumeration {
   val Setup, Mulligan, Battlefield, Action, Upkeep = Value
 }
 
-case class UniqueIdGenerator(val startId: Int) {
+case class UniqueIdGenerator(startId: Int) {
   var currentId = startId
   def next() = {
     val id = currentId
@@ -49,6 +49,8 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
   val areaPlayer2: PlayerArea = initPlayerArea(Player.Player2, deckPlayer2, 200)
 
   val gameHistory: GameHistory = new GameHistory
+  var cardIds: Map[Int, CardId] = Map.empty
+  var diceIds: Map[Int, CardId] = Map.empty
 
   def initPlayerArea(player: Player.Value, deck: FullDeck, startId: Int): PlayerArea = {
     val id = UniqueIdGenerator(startId)
@@ -56,14 +58,26 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
       val characterId = id.next
       val firstDice = new InPlayDice(id.next, c._1.character.dice.get)
       val dices = if (c._1.elite) Array(firstDice, new InPlayDice(id.next, c._1.character.dice.get)) else Array(firstDice)
+
+      cardIds += (characterId -> c._1.character.id)
+      dices.foreach(dice => diceIds += (dice.uniqueId -> c._1.character.id))
+
       new InPlayCharacter(characterId, c._1.character, dices)
     }
+
     val cardsWithId = deck.deck.zipWithIndex.map { c =>
       val cardId = id.next
       val dice = c._1.dice.map { d => new InPlayDice(id.next, d) }
+
+      cardIds += (cardId -> c._1.id)
+      dice.foreach(dice => diceIds += (dice.uniqueId -> c._1.id))
+
       InPlayCard(cardId, c._1, dice)
     }
+
     val battlefield = InPlayBattlefield(id.next, deck.battlefield)
+    cardIds += (battlefield.uniqueId -> battlefield.card.id)
+
     new PlayerArea(player, inPlayCharacters, new Deck(cardsWithId), Some(battlefield))
   }
 

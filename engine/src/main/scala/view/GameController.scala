@@ -1,6 +1,6 @@
 package view
 
-import entities.{CardId, CardSet, FullDeck}
+import entities.FullDeck
 import play._
 import play.history._
 
@@ -82,13 +82,11 @@ class GameController(player1: PlayerInfo, player2: PlayerInfo) {
   }
 
   private def buildCardView(uniqueId: Int): CardView = {
-    // TODO
-    CardView(uniqueId, CardId(CardSet.TwoPlayersGame, 1))
+    CardView(uniqueId, gameMechanics.cardIds(uniqueId))
   }
 
   private def buildDiceView(uniqueId: Int): DiceView = {
-    // TODO
-    DiceView(uniqueId, CardId(CardSet.TwoPlayersGame, 1))
+    DiceView(uniqueId, gameMechanics.diceIds(uniqueId))
   }
 
   /*
