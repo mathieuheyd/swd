@@ -77,7 +77,9 @@ class GameController(player1: PlayerInfo, player2: PlayerInfo) {
       case MulliganEffect(mulliganCards, drawnCards) => if (isPlayer)
         MulliganView(mulliganCards.map(buildCardView), drawnCards.map(buildCardView)) else
         MulliganOpponentView(mulliganCards.size, drawnCards.size)
-
+      case TossEffect(dices, total) => TossView(dices.map(d => DiceRollView(buildDiceView(d._1), d._2)), total)
+      case BattlefieldChosenEffect(battlefield) => ChooseBattlefieldView(buildCardView(battlefield))
+      case ShieldAddedEffect(character, amount) => ShieldAddedView(buildCardView(character), amount)
     }
   }
 

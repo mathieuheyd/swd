@@ -66,7 +66,8 @@ case class TossAction() extends GameAction {
 
     val dices = playerArea.characters.flatMap(_.dices)
     dices.foreach { d => d.roll() }
-    effects ++= dices.map(d => DiceRolledEffect(d.uniqueId, d.sideId))
+
+    effects += TossEffect(dices.map(d => (d.uniqueId, d.sideId)).toList, dices.map(_.currentSide.value).sum)
 
     val event = HistoryEvent(player, this, effects)
     history.setupActions += event
@@ -97,18 +98,24 @@ case class ChooseBattlefield(card: Int) extends GameAction {
   }
 }
 
-case class AddShield(card: Int) extends GameAction {
+case class AddShields(cards: List[Int]) extends GameAction {
   override val phase = GamePhase.Battlefield
   override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
     history.setupActions.exists(event => event.action.isInstanceOf[ChooseBattlefield]) &&
     playerArea.battlefield.isEmpty &&
-    history.setupActions.count(event => event.action.isInstanceOf[AddShield]) < 2 &&
-    playerArea.getCharacterOrSupport(card).isDefined
+    !history.setupActions.exists(event => event.action.isInstanceOf[AddShields]) &&
+    cards.forall(playerArea.getCharacterOrSupport(_).isDefined)
   }
   override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
-    playerArea.getCharacterOrSupport(card).get.shields += 1
+    val shields = cards.groupBy(identity).mapValues(_.size)
 
-    val event = HistoryEvent(player, this, Seq(ShieldAddedEffect(card, 1)))
+    val effects = mutable.Buffer.empty[HistoryEffect]
+    shields.foreach { case (character: Int, amount: Int) =>
+      playerArea.getCharacterOrSupport(character).get.shields += amount
+      effects += ShieldAddedEffect(character, amount)
+    }
+
+    val event = HistoryEvent(player, this, effects)
     history.setupActions += event
     event
   }

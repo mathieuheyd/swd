@@ -21,3 +21,5 @@ case class DrawStartingHandOpponentView(cards: Int) extends EffectView
 case class MulliganView(mulliganCards: List[CardView], drawnCards: List[CardView]) extends EffectView
 case class MulliganOpponentView(mulliganCards: Int, drawnCards: Int) extends EffectView
 case class TossView(dices: List[DiceRollView], total: Int) extends EffectView
+case class ChooseBattlefieldView(battlefield: CardView) extends EffectView
+case class ShieldAddedView(character: CardView, amount: Int) extends EffectView
