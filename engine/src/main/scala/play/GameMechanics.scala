@@ -42,14 +42,14 @@ case class UniqueIdGenerator(startId: Int) {
 
 class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
 
+  val gameHistory: GameHistory = new GameHistory
+  var cardIds: mutable.Map[Int, CardId] = mutable.Map.empty
+
   var phase: GamePhase = GamePhase.Setup
   var currentPlayer: Player.Value = Player.Player1
 
   val areaPlayer1: PlayerArea = initPlayerArea(Player.Player1, deckPlayer1, 100)
   val areaPlayer2: PlayerArea = initPlayerArea(Player.Player2, deckPlayer2, 200)
-
-  val gameHistory: GameHistory = new GameHistory
-  var cardIds: Map[Int, CardId] = Map.empty
 
   def initPlayerArea(player: Player.Value, deck: FullDeck, startId: Int): PlayerArea = {
     val id = UniqueIdGenerator(startId)

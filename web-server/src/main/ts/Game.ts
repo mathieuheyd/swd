@@ -16,15 +16,29 @@ class Game {
       console.log('Connection to Game closed');
     }
     this.socket.onmessage = (event: MessageEvent) => {
-      console.log('New message', event.data);
+      //console.log('New message', event.data);
       let jsonObj = JSON.parse(event.data);
-      let className = Object.getOwnPropertyNames(jsonObj)[0];
+      let instance = this.buildObject(jsonObj);
+      this.handleMessage(instance);
+    }
+  }
+
+  private buildObject(jsonObj: any) {
+    let properties = Object.getOwnPropertyNames(jsonObj);
+    if (properties.length == 1 && typeof((window as any)[properties[0]]) === "function") {
+      let className = properties[0];
       let instance = Object.create((window as any)[className].prototype);
       instance.constructor.apply(instance);
       for (let propName in jsonObj[className]) {
-        instance[propName] = jsonObj[className][propName]
+        if (Array.isArray(jsonObj[className][propName])) {
+          instance[propName] = jsonObj[className][propName].map((value: any) => this.buildObject(value));
+        } else {
+          instance[propName] = this.buildObject(jsonObj[className][propName]);
+        }
       }
-      this.handleMessage(instance);
+      return instance;
+    } else {
+      return jsonObj;
     }
   }
 
@@ -94,18 +108,40 @@ class SetupView implements EventView {
     game.view.setupGame(this.player.characters, this.player.battlefield, this.opponent.characters, this.opponent.battlefield);
   }
 }
-class DrawStartingHandView implements EventView {
-  player: Array<CardView>;
-  opponent: Number;
+class ActionView implements EventView {
+  player: Boolean;
+  //action: GameAction;
+  effects: Array<EffectView>;
 
   updateInterface(game: Game) {
-    for (let c of this.player) {
+    console.log(this.effects);
+    for (let effect of this.effects) {
+      effect.updateInterface(game);
+    }
+  }
+}
+
+interface EffectView {
+  updateInterface(game: Game): void;
+}
+class DrawStartingHandView implements EffectView {
+  cards: Array<CardView>;
+
+  updateInterface(game: Game) {
+    for (let c of this.cards) {
       game.view.playerHand.addCard(c);
     }
     game.startMulligan();
   }
 }
-class MulliganView implements EventView {
+class DrawStartingHandOpponentView implements EffectView {
+  cards: Number;
+
+  updateInterface(game: Game) {
+
+  }
+}
+class MulliganView implements EffectView {
   mulliganCards: Array<CardView>;
   drawnCards: Array<CardView>;
 
@@ -113,7 +149,7 @@ class MulliganView implements EventView {
 
   }
 }
-class MulliganOpponentView implements EventView {
+class MulliganOpponentView implements EffectView {
   mulliganCards: Number;
   drawnCards: Number;
 
