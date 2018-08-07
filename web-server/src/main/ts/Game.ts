@@ -88,6 +88,10 @@ class PlayerSetupView {
   battlefield: CardView;
   deckSize: Number;
 }
+class DiceRollView {
+  dice: DiceView;
+  side: Number;
+}
 
 interface EventView {
   updateInterface(game: Game): void;
@@ -138,7 +142,9 @@ class DrawStartingHandOpponentView implements EffectView {
   cards: Number;
 
   updateInterface(game: Game) {
-
+    for (let i = 0; i < this.cards; i++) {
+      game.view.opponentHand.addCard();
+    }
   }
 }
 class MulliganView implements EffectView {
@@ -146,12 +152,45 @@ class MulliganView implements EffectView {
   drawnCards: Array<CardView>;
 
   updateInterface(game: Game) {
-
+    for (let c of this.mulliganCards) {
+      game.view.playerHand.removeCard(c);
+    }
+    for (let c of this.drawnCards) {
+      game.view.playerHand.addCard(c);
+    }
   }
 }
 class MulliganOpponentView implements EffectView {
   mulliganCards: Number;
   drawnCards: Number;
+
+  updateInterface(game: Game) {
+    for (let i = 0; i < this.mulliganCards; i++) {
+      game.view.opponentHand.removeCard();
+    }
+    for (let i = 0; i < this.drawnCards; i++) {
+      game.view.opponentHand.addCard();
+    }
+  }
+}
+class TossView implements EffectView {
+  dices: Array<DiceRollView>;
+  total: Number;
+
+  updateInterface(game: Game) {
+
+  }
+}
+class ChooseBattlefieldView implements EffectView {
+  battlefield: CardView;
+
+  updateInterface(game: Game) {
+
+  }
+}
+class ShieldAddedView implements EffectView {
+  character: CardView;
+  amount: Number;
 
   updateInterface(game: Game) {
 

@@ -14,7 +14,15 @@ class HandInterface extends PIXI.Container {
 
   addCard(card: CardView) {
     this.cards.push(card);
+    this.updateDisplay();
+  }
 
+  removeCard(card: CardView) {
+    this.cards = this.cards.filter(c => c.uniqueId != card.uniqueId);
+    this.updateDisplay();
+  }
+
+  updateDisplay() {
     this.removeChildren();
     this.cardsInterfaces = Array();
 
