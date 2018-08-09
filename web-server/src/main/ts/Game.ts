@@ -52,9 +52,14 @@ class Game {
     this.view.playerActions.mulliganAction(this.mulligan);
   }
 
+  stopMulligan() {
+    this.view.playerHand.stopMulligan();
+    this.view.playerActions.noAction();
+  }
+
   mulligan = () => {
-    console.log('Mulligan', this.view.playerHand.cardsToMulligan);
     let cards = this.view.playerHand.cardsToMulligan;
+    this.stopMulligan();
     let message = { ActionUserMessage: {
       action: {
         MulliganAction: {

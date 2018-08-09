@@ -9,4 +9,8 @@ class ActionInterface extends PIXI.Container {
     this.addChild(text);
   }
 
+  noAction() {
+    this.removeChildren();
+  }
+
 }

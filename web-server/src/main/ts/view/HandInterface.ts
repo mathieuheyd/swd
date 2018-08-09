@@ -45,6 +45,10 @@ class HandInterface extends PIXI.Container {
     }
   }
 
+  stopMulligan() {
+    this.updateDisplay();
+  }
+
   selectCardToMulligan(card: CardInterface) {
     let uniqueId = card.card.uniqueId;
     console.log('card clicked', uniqueId);
