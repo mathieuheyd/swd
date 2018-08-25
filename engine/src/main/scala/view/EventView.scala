@@ -1,12 +1,13 @@
 package view
 
 import entities.CardId
-import play.GameAction
+import play.{ActionType, GameAction}
 
 sealed trait EventView {}
 case class GameInfoView(player: PlayerInfoView, opponent: PlayerInfoView) extends EventView
 case class SetupView(player: PlayerSetupView, opponent: PlayerSetupView) extends EventView
 case class ActionView(player: Boolean, action: GameAction, effects: List[EffectView]) extends EventView
+case class ActionRequiredView(player: Boolean, action: ActionType.Value) extends EventView
 
 case class PlayerInfoView(name: String)
 case class CharacterView(uniqueId: Int, card: CardId, dices: List[DiceView])

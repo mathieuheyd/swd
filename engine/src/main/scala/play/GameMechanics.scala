@@ -40,6 +40,17 @@ case class UniqueIdGenerator(startId: Int) {
   }
 }
 
+object ActionType extends Enumeration {
+  type ActionType = Value
+  val Mulligan = Value
+  val ChooseBattlefield = Value
+  val AddShields = Value
+}
+
+case class ActionRequired(player: Player.Value, actionType: ActionType.Value)
+
+case class GameEvent(events: Seq[HistoryEvent], nextActions: Seq[ActionRequired])
+
 class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
 
   val gameHistory: GameHistory = new GameHistory
@@ -80,24 +91,38 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
     new PlayerArea(player, inPlayCharacters, new Deck(cardsWithId), Some(battlefield))
   }
 
-  def drawStartingHands(): Seq[HistoryEvent] = {
+  def drawStartingHands(): GameEvent = {
     val events1 = handleAction(Player.Player1, DrawStartingHand())
     val events2 = handleAction(Player.Player2, DrawStartingHand())
 
     phase = GamePhase.Mulligan
 
-    Seq(events1, events2).flatten
+    val events = Seq(events1.events, events2.events).flatten
+    val nextActions = Seq(
+      ActionRequired(Player.Player1, ActionType.Mulligan),
+      ActionRequired(Player.Player2, ActionType.Mulligan)
+    )
+
+    GameEvent(events, nextActions)
   }
 
-  def handleToss(): Seq[HistoryEvent] = {
+  def handleToss(): GameEvent = {
     val events1 = handleAction(Player.Player1, TossAction())
     val events2 = handleAction(Player.Player2, TossAction())
 
-    Seq(events1, events2).flatten
+    val total1 = events1.events.head.effects.head.asInstanceOf[TossEffect].total
+    val total2 = events2.events.head.effects.head.asInstanceOf[TossEffect].total
+    val winner = if (total1 >= total2) Player.Player1 else Player.Player2
+
+    val events = Seq(events1.events, events2.events).flatten
+    val nextAction = ActionRequired(winner, ActionType.ChooseBattlefield)
+
+    GameEvent(events, Seq(nextAction))
   }
 
-  def handleAction(player: Player.Value, action: GameAction): Seq[HistoryEvent] = {
+  def handleAction(player: Player.Value, action: GameAction): GameEvent = {
     var events = mutable.Buffer.empty[HistoryEvent]
+    var actions = mutable.Buffer.empty[ActionRequired]
 
     val (playerArea, opponentArea) = if (player == Player.Player1) (areaPlayer1, areaPlayer2) else (areaPlayer2, areaPlayer1)
 
@@ -110,7 +135,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
 
     if (!validAction) {
       Console.out.println("Invalid action", player, action)
-      return events
+      return null
     }
 
     events += action.process(player, playerArea, opponentArea, gameHistory)
@@ -120,7 +145,9 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
       case GamePhase.Mulligan =>
         if (gameHistory.setupActions.count(event => event.action.isInstanceOf[MulliganAction]) == 2) {
           phase = GamePhase.Battlefield
-          events ++= handleToss()
+          val tossOutput = handleToss()
+          events ++= tossOutput.events
+          actions ++= tossOutput.nextActions
         }
       case GamePhase.Battlefield =>
         if (gameHistory.setupActions.exists(event => event.action.isInstanceOf[ChooseBattlefield])) {
@@ -147,7 +174,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
       case _ =>
     }
 
-    events
+    GameEvent(events, actions)
   }
 
   def upkeepPhase(): Unit = {

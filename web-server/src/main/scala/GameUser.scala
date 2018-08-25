@@ -4,7 +4,7 @@ import Argonaut._
 import ArgonautShapeless._
 import GameRoom.EventViewMessage
 import entities.CardSet
-import play.GameAction
+import play.{ActionType, GameAction}
 import view.EventView
 
 object GameUser {
@@ -20,6 +20,9 @@ object GameUser {
 
   implicit def CardSetEncodeJson: EncodeJson[CardSet.CardSet] = EncodeJson({
     case value => value.id.asJson
+  })
+  implicit def ActionTypeEncodeJson: EncodeJson[ActionType.ActionType] = EncodeJson({
+    case value => value.toString.asJson
   })
 
   val eventViewEncoder = EncodeJson.of[EventView]

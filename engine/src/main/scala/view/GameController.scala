@@ -34,7 +34,8 @@ class GameController(player1: PlayerInfo, player2: PlayerInfo) {
 
     // Draw starting hands
     val drawEvents = gameMechanics.drawStartingHands()
-    events ++= drawEvents.map(buildBothSideView)
+    events ++= drawEvents.events.map(buildBothSideView)
+    events ++= drawEvents.nextActions.map(buildBothSideView)
 
     events
   }
@@ -52,8 +53,9 @@ class GameController(player1: PlayerInfo, player2: PlayerInfo) {
   }
 
   def playerAction(player: Player.Value, action: GameAction): Seq[BothSideEventView] = {
-    val historyEvent = gameMechanics.handleAction(player, action)
-    historyEvent.map(event => buildBothSideView(event))
+    val gameEvent = gameMechanics.handleAction(player, action)
+    gameEvent.events.map(event => buildBothSideView(event)) ++
+      gameEvent.nextActions.map(action => buildBothSideView(action))
   }
 
   private def buildBothSideView(event: HistoryEvent): BothSideEventView = {
@@ -81,6 +83,13 @@ class GameController(player1: PlayerInfo, player2: PlayerInfo) {
       case BattlefieldChosenEffect(battlefield) => ChooseBattlefieldView(buildCardView(battlefield))
       case ShieldAddedEffect(character, amount) => ShieldAddedView(buildCardView(character), amount)
     }
+  }
+
+  private def buildBothSideView(action: ActionRequired): BothSideEventView = {
+    BothSideEventView(
+      ActionRequiredView(action.player == Player.Player1, action.actionType),
+      ActionRequiredView(action.player == Player.Player2, action.actionType)
+    )
   }
 
   private def buildCardView(uniqueId: Int): CardView = {

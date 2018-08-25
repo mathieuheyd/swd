@@ -129,6 +129,23 @@ class ActionView implements EventView {
     }
   }
 }
+class ActionRequiredView implements EventView {
+  player: Boolean;
+  action: String;
+
+  updateInterface(game: Game) {
+    if (this.player) {
+      console.log('Action Required' + this.action);
+      if (this.action == 'Mulligan') {
+        game.startMulligan();
+      } else if (this.action == 'ChooseBattlefield') {
+
+      } else if (this.action == 'AddShields') {
+
+      }
+    }
+  }
+}
 
 interface EffectView {
   updateInterface(game: Game): void;
@@ -140,7 +157,6 @@ class DrawStartingHandView implements EffectView {
     for (let c of this.cards) {
       game.view.playerHand.addCard(c);
     }
-    game.startMulligan();
   }
 }
 class DrawStartingHandOpponentView implements EffectView {
