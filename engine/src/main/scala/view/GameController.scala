@@ -63,24 +63,24 @@ class GameController(player1: PlayerInfo, player2: PlayerInfo) {
       ActionView(
         event.player == Player.Player1,
         event.action,
-        event.effects.map(effect => buildEffectView(effect, event.player == Player.Player1)).toList),
+        event.effects.map(effect => buildEffectView(effect, Player.Player1, event.player == Player.Player1)).toList),
       ActionView(
         event.player == Player.Player2,
         event.action,
-        event.effects.map(effect => buildEffectView(effect, event.player == Player.Player2)).toList)
+        event.effects.map(effect => buildEffectView(effect, Player.Player2, event.player == Player.Player2)).toList)
     )
   }
 
-  private def buildEffectView(effect: HistoryEffect, isPlayer: Boolean): EffectView = {
+  private def buildEffectView(effect: HistoryEffect, player: Player.Value, isPlayerAction: Boolean): EffectView = {
     effect match {
-      case DrawHandEffect(cards: List[Int]) => if (isPlayer)
+      case DrawHandEffect(cards: List[Int]) => if (isPlayerAction)
         DrawStartingHandView(cards.map(buildCardView)) else
         DrawStartingHandOpponentView(cards.size)
-      case MulliganEffect(mulliganCards, drawnCards) => if (isPlayer)
+      case MulliganEffect(mulliganCards, drawnCards) => if (isPlayerAction)
         MulliganView(mulliganCards.map(buildCardView), drawnCards.map(buildCardView)) else
         MulliganOpponentView(mulliganCards.size, drawnCards.size)
       case TossEffect(dices, total) => TossView(dices.map(d => DiceRollView(buildDiceView(d._1), d._2)), total)
-      case BattlefieldChosenEffect(battlefield) => ChooseBattlefieldView(buildCardView(battlefield))
+      case BattlefieldChosenEffect(battlefieldOwner) => ChooseBattlefieldView(player == battlefieldOwner)
       case ShieldAddedEffect(character, amount) => ShieldAddedView(buildCardView(character), amount)
     }
   }

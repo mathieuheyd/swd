@@ -7,7 +7,7 @@ sealed trait HistoryEffect
 case class DrawHandEffect(cards: List[Int]) extends HistoryEffect
 case class MulliganEffect(mulliganCards: List[Int], drawnCards: List[Int]) extends HistoryEffect
 case class TossEffect(dices: List[(Int, Int)], total: Int) extends HistoryEffect
-case class BattlefieldChosenEffect(uniqueId: Int) extends HistoryEffect
+case class BattlefieldChosenEffect(player: Player.Value) extends HistoryEffect
 
 case class CharacterActivatedEffect(uniqueId: Int) extends HistoryEffect
 case class CharacterReadiedEffect(uniqueId: Int) extends HistoryEffect

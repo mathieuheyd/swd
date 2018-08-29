@@ -70,6 +70,30 @@ class Game {
     this.socket.send(JSON.stringify(message));
   }
 
+  startChooseBattlefield() {
+    this.view.playerActions.chooseBattlefieldAction();
+    this.view.playerBattlefield.startChoose(this.chooseBattlefield);
+    this.view.opponentBattlefield.startChoose(this.chooseBattlefield);
+  }
+
+  stopChooseBattlefield() {
+    this.view.playerActions.noAction();
+    this.view.playerBattlefield.stopChoose();
+    this.view.opponentBattlefield.stopChoose();
+  }
+
+  chooseBattlefield = (cardId: Number) => {
+    this.stopChooseBattlefield();
+    let message = { ActionUserMessage: {
+      action: {
+        ChooseBattlefield: {
+          card: cardId
+        }
+      }
+    }};
+    this.socket.send(JSON.stringify(message));
+  }
+
 }
 
 class CharacterView {
@@ -139,7 +163,7 @@ class ActionRequiredView implements EventView {
       if (this.action == 'Mulligan') {
         game.startMulligan();
       } else if (this.action == 'ChooseBattlefield') {
-
+        game.startChooseBattlefield();
       } else if (this.action == 'AddShields') {
 
       }
@@ -203,10 +227,14 @@ class TossView implements EffectView {
   }
 }
 class ChooseBattlefieldView implements EffectView {
-  battlefield: CardView;
+  player: Boolean;
 
   updateInterface(game: Game) {
-
+    if (this.player) {
+      game.view.opponentBattlefield.setCard(null);
+    } else {
+      game.view.playerBattlefield.setCard(null);
+    }
   }
 }
 class ShieldAddedView implements EffectView {

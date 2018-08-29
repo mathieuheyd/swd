@@ -84,14 +84,17 @@ case class ChooseBattlefield(card: Int) extends GameAction {
     (playerArea.battlefield.exists(_.uniqueId == card) || opponentArea.battlefield.exists(_.uniqueId == card))
   }
   override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
+    var battlefieldOwner = Player.Player1
     if (!playerArea.battlefield.exists(_.uniqueId == card)) {
+      battlefieldOwner = player.opponent
       playerArea.battlefield = None
     }
     if (!opponentArea.battlefield.exists(_.uniqueId == card)) {
+      battlefieldOwner = player
       opponentArea.battlefield = None
     }
 
-    val effect = BattlefieldChosenEffect(card)
+    val effect = BattlefieldChosenEffect(battlefieldOwner)
     val event = HistoryEvent(player, this, Seq(effect))
     history.setupActions += event
     event
