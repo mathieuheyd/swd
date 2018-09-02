@@ -78,10 +78,18 @@ case class TossAction() extends GameAction {
 case class ChooseBattlefield(card: Int) extends GameAction {
   override val phase = GamePhase.Battlefield
   override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
-    history.setupActions.count(event => event.action.isInstanceOf[TossAction]) % 2 == 0 &&
-    !history.setupActions.exists(event => event.action.isInstanceOf[ChooseBattlefield]) &&
-    playerArea.characters.flatMap(_.dices.map(_.currentSide.value)).sum > opponentArea.characters.flatMap(_.dices.map(_.currentSide.value)).sum &&
-    (playerArea.battlefield.exists(_.uniqueId == card) || opponentArea.battlefield.exists(_.uniqueId == card))
+    Rule(
+      history.setupActions.count(event => event.action.isInstanceOf[TossAction]) % 2 == 0,
+      "Action must appear after toss has occured").isValid &&
+    Rule(
+      !history.setupActions.exists(event => event.action.isInstanceOf[ChooseBattlefield]),
+      "Battlefield has already been chosen").isValid &&
+    Rule(
+      playerArea.characters.flatMap(_.dices.map(_.currentSide.value)).sum > opponentArea.characters.flatMap(_.dices.map(_.currentSide.value)).sum,
+      "Wrong player choosing battlefield").isValid &&
+    Rule(
+      playerArea.battlefield.exists(_.uniqueId == card) || opponentArea.battlefield.exists(_.uniqueId == card),
+      "Targeted card is not an in-game battlefield").isValid
   }
   override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
     var battlefieldOwner = Player.Player1
@@ -320,5 +328,14 @@ case class ClaimBattlefield() extends GameAction {
     val battlefield = Seq(playerArea.battlefield, opponentArea.battlefield).flatten.head
     playerArea.battlefield = Some(battlefield)
     HistoryEvent(player, this, Seq.empty)
+  }
+}
+
+private case class Rule(check: Boolean, reason: String) {
+  def isValid = {
+    if (!check) {
+      Console.out.println(reason)
+    }
+    check
   }
 }
