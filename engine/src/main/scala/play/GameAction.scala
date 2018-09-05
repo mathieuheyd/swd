@@ -85,7 +85,7 @@ case class ChooseBattlefield(card: Int) extends GameAction {
       !history.setupActions.exists(event => event.action.isInstanceOf[ChooseBattlefield]),
       "Battlefield has already been chosen").isValid &&
     Rule(
-      playerArea.characters.flatMap(_.dices.map(_.currentSide.value)).sum > opponentArea.characters.flatMap(_.dices.map(_.currentSide.value)).sum,
+      playerArea.characters.flatMap(_.dices.map(_.currentSide.value)).sum >= opponentArea.characters.flatMap(_.dices.map(_.currentSide.value)).sum,
       "Wrong player choosing battlefield").isValid &&
     Rule(
       playerArea.battlefield.exists(_.uniqueId == card) || opponentArea.battlefield.exists(_.uniqueId == card),
@@ -109,24 +109,27 @@ case class ChooseBattlefield(card: Int) extends GameAction {
   }
 }
 
-case class AddShields(cards: List[Int]) extends GameAction {
-  override val phase = GamePhase.Battlefield
+case class AddShield(card: Int) extends GameAction {
+  override val phase = GamePhase.AddShields
   override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
-    history.setupActions.exists(event => event.action.isInstanceOf[ChooseBattlefield]) &&
-    playerArea.battlefield.isEmpty &&
-    !history.setupActions.exists(event => event.action.isInstanceOf[AddShields]) &&
-    cards.forall(playerArea.getCharacterOrSupport(_).isDefined)
+    Rule(
+      history.setupActions.exists(event => event.action.isInstanceOf[ChooseBattlefield]),
+      "Action must appear after battlefield has been chosen").isValid &&
+    Rule(
+      playerArea.battlefield.isEmpty,
+      "Player must the one whose battlefield has not been chosen").isValid &&
+    Rule(
+      history.setupActions.count(event => event.action.isInstanceOf[AddShield]) < 3,
+      "Only 3 actions are allowed").isValid &&
+    Rule(
+      playerArea.getCharacterOrSupport(card).isDefined,
+      "Actions must target a valid character").isValid
   }
   override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
-    val shields = cards.groupBy(identity).mapValues(_.size)
+    playerArea.getCharacterOrSupport(card).get.shields += 1
+    val effect = ShieldAddedEffect(card, 1)
 
-    val effects = mutable.Buffer.empty[HistoryEffect]
-    shields.foreach { case (character: Int, amount: Int) =>
-      playerArea.getCharacterOrSupport(character).get.shields += amount
-      effects += ShieldAddedEffect(character, amount)
-    }
-
-    val event = HistoryEvent(player, this, effects)
+    val event = HistoryEvent(player, this, Seq(effect))
     history.setupActions += event
     event
   }

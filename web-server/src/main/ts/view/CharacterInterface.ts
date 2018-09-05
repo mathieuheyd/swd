@@ -2,9 +2,12 @@
 
 class CharacterInterface extends PIXI.Container {
 
+  character: CardInterface;
+
   constructor(character: CharacterView) {
     super();
-    this.addChild(new CardInterface(character));
+    this.character = new CardInterface(character);
+    this.addChild(this.character);
   }
 
 }

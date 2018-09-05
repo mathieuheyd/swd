@@ -28,7 +28,7 @@ object Player extends Enumeration {
 //  - Actions until both players pass
 object GamePhase extends Enumeration {
   type GamePhase = Value
-  val Setup, Mulligan, Battlefield, Action, Upkeep = Value
+  val Setup, Mulligan, Battlefield, AddShields, Action, Upkeep = Value
 }
 
 case class UniqueIdGenerator(startId: Int) {
@@ -126,11 +126,9 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
 
     val (playerArea, opponentArea) = if (player == Player.Player1) (areaPlayer1, areaPlayer2) else (areaPlayer2, areaPlayer1)
 
-    val validAction = action.phase == phase &&
-      (phase match {
-        case GamePhase.Action => player == currentPlayer
-        case _ => true
-      }) &&
+    val validAction =
+      Rule(action.phase == phase, "Action must appear in correct phase").isValid &&
+      Rule(phase != GamePhase.Action || player == currentPlayer, "Not current player turn").isValid &&
       action.isValid(player, playerArea, opponentArea, gameHistory)
 
     if (!validAction) {
@@ -151,7 +149,15 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
         }
       case GamePhase.Battlefield =>
         if (gameHistory.setupActions.exists(event => event.action.isInstanceOf[ChooseBattlefield])) {
-          // TODO prepare game history for new round
+          phase = GamePhase.AddShields
+          val battlefieldLoser = if (areaPlayer1.battlefield.isEmpty) Player.Player1 else Player.Player2
+          actions :+= ActionRequired(battlefieldLoser, ActionType.AddShields)
+        }
+      case GamePhase.AddShields =>
+        if (gameHistory.setupActions.count(event => event.action.isInstanceOf[AddShield]) < 3) {
+          val battlefieldLoser = if (areaPlayer1.battlefield.isEmpty) Player.Player1 else Player.Player2
+          actions :+= ActionRequired(battlefieldLoser, ActionType.AddShields)
+        } else {
           phase = GamePhase.Action
         }
       case GamePhase.Action => {

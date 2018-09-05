@@ -14,6 +14,11 @@ class ActionInterface extends PIXI.Container {
     this.addChild(text);
   }
 
+  addShieldsAction() {
+    let text = new PIXI.Text('Add Shields');
+    this.addChild(text);
+  }
+
   noAction() {
     this.removeChildren();
   }

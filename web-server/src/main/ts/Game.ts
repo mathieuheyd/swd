@@ -94,6 +94,28 @@ class Game {
     this.socket.send(JSON.stringify(message));
   }
 
+  startAddShields() {
+    this.view.playerActions.addShieldsAction();
+    this.view.playerCharacters.startAddShields(this.addShields);
+  }
+
+  stopAddShields() {
+    this.view.playerActions.noAction();
+    this.view.playerCharacters.stopAddShields();
+  }
+
+  addShields = (uniqueId: Number) => {
+    this.stopAddShields();
+    let message = { ActionUserMessage: {
+      action: {
+        AddShield: {
+          card: uniqueId
+        }
+      }
+    }};
+    this.socket.send(JSON.stringify(message));
+  }
+
 }
 
 class CharacterView {
@@ -165,7 +187,7 @@ class ActionRequiredView implements EventView {
       } else if (this.action == 'ChooseBattlefield') {
         game.startChooseBattlefield();
       } else if (this.action == 'AddShields') {
-
+        game.startAddShields();
       }
     }
   }
