@@ -119,29 +119,29 @@ class Game {
 }
 
 class CharacterView {
-  uniqueId: Number;
+  uniqueId: number;
   card: CardId;
   dices: Array<DiceView>;
 }
 class DiceView {
-  uniqueId: Number;
+  uniqueId: number;
   card: CardId;
 }
 class CardView {
-  uniqueId: Number;
+  uniqueId: number;
   card: CardId;
 }
 class PlayerInfoView {
-  name: String;
+  name: string;
 }
 class PlayerSetupView {
   characters: Array<CharacterView>;
   battlefield: CardView;
-  deckSize: Number;
+  deckSize: number;
 }
 class DiceRollView {
   dice: DiceView;
-  side: Number;
+  side: number;
 }
 
 interface EventView {
@@ -164,7 +164,7 @@ class SetupView implements EventView {
   }
 }
 class ActionView implements EventView {
-  player: Boolean;
+  player: boolean;
   //action: GameAction;
   effects: Array<EffectView>;
 
@@ -176,8 +176,8 @@ class ActionView implements EventView {
   }
 }
 class ActionRequiredView implements EventView {
-  player: Boolean;
-  action: String;
+  player: boolean;
+  action: string;
 
   updateInterface(game: Game) {
     if (this.player) {
@@ -206,7 +206,7 @@ class DrawStartingHandView implements EffectView {
   }
 }
 class DrawStartingHandOpponentView implements EffectView {
-  cards: Number;
+  cards: number;
 
   updateInterface(game: Game) {
     for (let i = 0; i < this.cards; i++) {
@@ -228,8 +228,8 @@ class MulliganView implements EffectView {
   }
 }
 class MulliganOpponentView implements EffectView {
-  mulliganCards: Number;
-  drawnCards: Number;
+  mulliganCards: number;
+  drawnCards: number;
 
   updateInterface(game: Game) {
     for (let i = 0; i < this.mulliganCards; i++) {
@@ -242,14 +242,14 @@ class MulliganOpponentView implements EffectView {
 }
 class TossView implements EffectView {
   dices: Array<DiceRollView>;
-  total: Number;
+  total: number;
 
   updateInterface(game: Game) {
 
   }
 }
 class ChooseBattlefieldView implements EffectView {
-  player: Boolean;
+  player: boolean;
 
   updateInterface(game: Game) {
     if (this.player) {
@@ -261,9 +261,12 @@ class ChooseBattlefieldView implements EffectView {
 }
 class ShieldAddedView implements EffectView {
   character: CardView;
-  amount: Number;
+  amount: number;
 
   updateInterface(game: Game) {
-
+    let character = game.view.playerCharacters.characterInterfaces
+      .concat(game.view.opponentCharacters.characterInterfaces)
+      .filter(character => character.character.card.uniqueId == this.character.uniqueId)[0];
+    character.updateShields(this.amount);
   }
 }
