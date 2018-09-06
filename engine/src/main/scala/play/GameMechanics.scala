@@ -45,6 +45,7 @@ object ActionType extends Enumeration {
   val Mulligan = Value
   val ChooseBattlefield = Value
   val AddShields = Value
+  val Action = Value
 }
 
 case class ActionRequired(player: Player.Value, actionType: ActionType.Value)
@@ -154,11 +155,12 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
           actions :+= ActionRequired(battlefieldLoser, ActionType.AddShields)
         }
       case GamePhase.AddShields =>
+        val battlefieldOwner = if (areaPlayer1.battlefield.isEmpty) Player.Player1 else Player.Player2
         if (gameHistory.setupActions.count(event => event.action.isInstanceOf[AddShield]) < 3) {
-          val battlefieldLoser = if (areaPlayer1.battlefield.isEmpty) Player.Player1 else Player.Player2
-          actions :+= ActionRequired(battlefieldLoser, ActionType.AddShields)
+          actions :+= ActionRequired(battlefieldOwner.opponent, ActionType.AddShields)
         } else {
           phase = GamePhase.Action
+          actions :+= ActionRequired(battlefieldOwner, ActionType.Action)
         }
       case GamePhase.Action => {
         val bothPlayersPass = gameHistory.currentRoundActions
