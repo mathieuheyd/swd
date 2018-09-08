@@ -116,6 +116,24 @@ class Game {
     this.socket.send(JSON.stringify(message));
   }
 
+  startAction() {
+    this.view.playerActions.passAction(this.pass);
+  }
+
+  stopAction() {
+    this.view.playerActions.noAction();
+  }
+
+  pass = () => {
+    this.stopAction();
+    let message = { ActionUserMessage: {
+      action: {
+        PassAction: {}
+      }
+    }};
+    this.socket.send(JSON.stringify(message));
+  }
+
 }
 
 class CharacterView {

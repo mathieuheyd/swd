@@ -19,6 +19,13 @@ class ActionInterface extends PIXI.Container {
     this.addChild(text);
   }
 
+  passAction(onPass: Function) {
+    let text = new PIXI.Text('Pass');
+    text.interactive = true;
+    text.on('click', onPass);
+    this.addChild(text);
+  }
+
   noAction() {
     this.removeChildren();
   }
