@@ -31,4 +31,19 @@ class CharactersInterface extends PIXI.Container {
     }
   }
 
+  startActivateCharacter(onActivate: Function) {
+    for (let c of this.characterInterfaces) {
+      if (!c.activated) {
+        c.character.interactive = true;
+        c.character.on('click', () => onActivate(c.character.card.uniqueId));
+      }
+    }
+  }
+
+  stopActivateCharacter() {
+    for (let c of this.characterInterfaces) {
+      c.character.removeAllListeners();
+    }
+  }
+
 }

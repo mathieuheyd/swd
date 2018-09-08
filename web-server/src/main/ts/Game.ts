@@ -104,7 +104,7 @@ class Game {
     this.view.playerCharacters.stopAddShields();
   }
 
-  addShields = (uniqueId: Number) => {
+  addShields = (uniqueId: number) => {
     this.stopAddShields();
     let message = { ActionUserMessage: {
       action: {
@@ -118,10 +118,16 @@ class Game {
 
   startAction() {
     this.view.playerActions.passAction(this.pass);
+    this.view.playerCharacters.startActivateCharacter(this.activateCharacter);
+    this.view.playerBattlefield.startClaim(this.claimBattlefield);
+    this.view.opponentBattlefield.startClaim(this.claimBattlefield);
   }
 
   stopAction() {
     this.view.playerActions.noAction();
+    this.view.playerCharacters.stopActivateCharacter();
+    this.view.playerBattlefield.stopClaim();
+    this.view.opponentBattlefield.stopClaim();
   }
 
   pass = () => {
@@ -129,6 +135,28 @@ class Game {
     let message = { ActionUserMessage: {
       action: {
         PassAction: {}
+      }
+    }};
+    this.socket.send(JSON.stringify(message));
+  }
+
+  activateCharacter = (uniqueId: number) => {
+    this.stopAction();
+    let message = { ActionUserMessage: {
+      action: {
+        ActivateAction: {
+          card: uniqueId
+        }
+      }
+    }};
+    this.socket.send(JSON.stringify(message));
+  }
+
+  claimBattlefield = () => {
+    this.stopAction();
+    let message = { ActionUserMessage: {
+      action: {
+        ClaimBattlefield: {}
       }
     }};
     this.socket.send(JSON.stringify(message));
@@ -206,6 +234,8 @@ class ActionRequiredView implements EventView {
         game.startChooseBattlefield();
       } else if (this.action == 'AddShields') {
         game.startAddShields();
+      } else if (this.action == 'Action') {
+        game.startAction();
       }
     }
   }

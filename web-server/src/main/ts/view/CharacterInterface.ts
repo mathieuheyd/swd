@@ -4,6 +4,8 @@ class CharacterInterface extends PIXI.Container {
 
   character: CardInterface;
 
+  activated: boolean = false;
+
   damages: number = 0;
 
   shields: number = 0;

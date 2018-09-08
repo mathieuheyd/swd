@@ -3,7 +3,10 @@
 class BattlefieldInterface extends PIXI.Container {
 
   card: CardView;
+
   cardInterface: CardInterface;
+
+  claimed: boolean = false;
 
   constructor(card: CardView) {
     super();
@@ -30,6 +33,17 @@ class BattlefieldInterface extends PIXI.Container {
   }
 
   stopChoose() {
+    this.updateDisplay();
+  }
+
+  startClaim(onClaim: Function) {
+    if (this.cardInterface != null && !this.claimed) {
+      this.cardInterface.interactive = true;
+      this.cardInterface.on('click', onClaim);
+    }
+  }
+
+  stopClaim() {
     this.updateDisplay();
   }
 
