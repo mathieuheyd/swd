@@ -155,7 +155,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
           actions :+= ActionRequired(battlefieldLoser, ActionType.AddShields)
         }
       case GamePhase.AddShields =>
-        val battlefieldOwner = if (areaPlayer1.battlefield.isEmpty) Player.Player1 else Player.Player2
+        val battlefieldOwner = if (areaPlayer1.battlefield.isDefined) Player.Player1 else Player.Player2
         if (gameHistory.setupActions.count(event => event.action.isInstanceOf[AddShield]) < 3) {
           actions :+= ActionRequired(battlefieldOwner.opponent, ActionType.AddShields)
         } else {
