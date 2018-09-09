@@ -128,3 +128,37 @@ class ShieldAddedView implements EffectView {
     character.updateShields(this.amount);
   }
 }
+class CharacterActivatedView implements EffectView {
+  character: CardView;
+
+  updateInterface(game: Game) {
+    let character = game.view.playerCharacters.characterInterfaces
+      .concat(game.view.opponentCharacters.characterInterfaces)
+      .filter(character => character.character.card.uniqueId == this.character.uniqueId)[0];
+    character.activateCharacter();
+  }
+}
+class DiceInPoolView implements EffectView {
+  dice: DiceView;
+  side: number;
+
+  updateInterface(game: Game) {
+
+  }
+}
+class BattlefieldClaimedView implements EffectView {
+  player: boolean;
+
+  updateInterface(game: Game) {
+    let battlefield = game.view.opponentBattlefield.card || game.view.playerBattlefield.card;
+    if (this.player) {
+      game.view.opponentBattlefield.setCard(null);
+      game.view.playerBattlefield.setCard(battlefield);
+      game.view.playerBattlefield.claimed = true;
+    } else {
+      game.view.playerBattlefield.setCard(null);
+      game.view.opponentBattlefield.setCard(battlefield);
+      game.view.opponentBattlefield.claimed = true;
+    }
+  }
+}

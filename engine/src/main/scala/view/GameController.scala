@@ -82,6 +82,9 @@ class GameController(player1: PlayerInfo, player2: PlayerInfo) {
       case TossEffect(dices, total) => TossView(dices.map(d => DiceRollView(buildDiceView(d._1), d._2)), total)
       case BattlefieldChosenEffect(battlefieldOwner) => ChooseBattlefieldView(player == battlefieldOwner)
       case ShieldAddedEffect(character, amount) => ShieldAddedView(buildCardView(character), amount)
+      case CharacterActivatedEffect(character) => CharacterActivatedView(buildCardView(character))
+      case DiceInPoolEffect(dice, side) => DiceInPoolView(buildDiceView(dice), side)
+      case BattlefieldClaimedEffect() => BattlefieldClaimedView(isPlayerAction)
     }
   }
 

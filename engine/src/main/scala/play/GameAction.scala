@@ -190,8 +190,7 @@ case class ActivateAction(card: Int) extends GameAction {
     character.dices.foreach(dice => {
       dice.inPool = true
       dice.roll()
-      effects +=  DiceInPoolEffect(dice.uniqueId)
-      effects +=  DiceRolledEffect(dice.uniqueId, dice.sideId)
+      effects +=  DiceInPoolEffect(dice.uniqueId, dice.sideId)
     })
 
     HistoryEvent(player, this, effects)
@@ -330,7 +329,7 @@ case class ClaimBattlefield() extends GameAction {
   override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
     val battlefield = Seq(playerArea.battlefield, opponentArea.battlefield).flatten.head
     playerArea.battlefield = Some(battlefield)
-    HistoryEvent(player, this, Seq.empty)
+    HistoryEvent(player, this, Seq(BattlefieldClaimedEffect()))
   }
 }
 

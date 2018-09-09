@@ -24,3 +24,6 @@ case class MulliganOpponentView(mulliganCards: Int, drawnCards: Int) extends Eff
 case class TossView(dices: List[DiceRollView], total: Int) extends EffectView
 case class ChooseBattlefieldView(player: Boolean) extends EffectView
 case class ShieldAddedView(character: CardView, amount: Int) extends EffectView
+case class CharacterActivatedView(character: CardView) extends EffectView
+case class DiceInPoolView(dice: DiceView, side: Int) extends EffectView
+case class BattlefieldClaimedView(player: Boolean) extends EffectView

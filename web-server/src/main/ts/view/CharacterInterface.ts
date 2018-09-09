@@ -41,6 +41,18 @@ class CharacterInterface extends PIXI.Container {
     this.updateDisplay();
   }
 
+  activateCharacter() {
+    this.activated = true;
+    this.character.exhausted = true;
+    this.character.updateDisplay();
+  }
+
+  readyCharacter() {
+    this.activated = false;
+    this.character.exhausted = false;
+    this.character.updateDisplay();
+  }
+
   updateDisplay() {
     this.damageAndShieldsInterface.removeChildren();
 
