@@ -107,15 +107,18 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
     GameEvent(events, nextActions)
   }
 
-  def handleToss(): GameEvent = {
-    val events1 = handleAction(Player.Player1, TossAction())
-    val events2 = handleAction(Player.Player2, TossAction())
+  def handleSetup(): GameEvent = {
+    val eventSetup1 = handleAction(Player.Player1, SetupAction())
+    val eventSetup2 = handleAction(Player.Player2, SetupAction())
 
-    val total1 = events1.events.head.effects.head.asInstanceOf[TossEffect].total
-    val total2 = events2.events.head.effects.head.asInstanceOf[TossEffect].total
+    val eventToss1 = handleAction(Player.Player1, TossAction())
+    val eventToss2 = handleAction(Player.Player2, TossAction())
+
+    val total1 = eventToss1.events.head.effects.head.asInstanceOf[TossEffect].total
+    val total2 = eventToss2.events.head.effects.head.asInstanceOf[TossEffect].total
     val winner = if (total1 >= total2) Player.Player1 else Player.Player2
 
-    val events = Seq(events1.events, events2.events).flatten
+    val events = Seq(eventSetup1.events, eventSetup2.events, eventToss1.events, eventToss2.events).flatten
     val nextAction = ActionRequired(winner, ActionType.ChooseBattlefield)
 
     GameEvent(events, Seq(nextAction))
@@ -144,7 +147,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
       case GamePhase.Mulligan =>
         if (gameHistory.setupActions.count(event => event.action.isInstanceOf[MulliganAction]) == 2) {
           phase = GamePhase.Battlefield
-          val tossOutput = handleToss()
+          val tossOutput = handleSetup()
           events ++= tossOutput.events
           actions ++= tossOutput.nextActions
         }

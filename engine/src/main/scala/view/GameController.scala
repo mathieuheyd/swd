@@ -79,6 +79,7 @@ class GameController(player1: PlayerInfo, player2: PlayerInfo) {
       case MulliganEffect(mulliganCards, drawnCards) => if (isPlayerAction)
         MulliganView(mulliganCards.map(buildCardView), drawnCards.map(buildCardView)) else
         MulliganOpponentView(mulliganCards.size, drawnCards.size)
+      case ResourceAddedEffect(resourceOwner, amount) => ResourceAddedView(resourceOwner == player, amount)
       case TossEffect(dices, total) => TossView(dices.map(d => DiceRollView(buildDiceView(d._1), d._2)), total)
       case BattlefieldChosenEffect(battlefieldOwner) => ChooseBattlefieldView(player == battlefieldOwner)
       case ShieldAddedEffect(character, amount) => ShieldAddedView(buildCardView(character), amount)

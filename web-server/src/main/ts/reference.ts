@@ -13,6 +13,6 @@
 /// <reference path="view/GameInterface.ts" />
 /// <reference path="view/HandInterface.ts" />
 /// <reference path="view/HandOpponentInterface.ts" />
-
+/// <reference path="view/ResourcesInterface.ts" />
 
 /// <reference path="pixi.js.d.ts" />

@@ -3,14 +3,14 @@
 class GameInterface extends PIXI.Container {
   opponentBattlefield: BattlefieldInterface;
   opponentHand: HandOpponentInterface;
-  private opponentResources: PIXI.Container = this.addContainer(650, 0, 150, 100, 0x0000aa);
+  opponentResources: ResourcesInterface;
   private opponentSupports: PIXI.Container = this.addContainer(0, 100, 150, 200, 0x0000dd);
   opponentCharacters: CharactersInterface;
   private opponentDeck: PIXI.Container = this.addContainer(650, 100, 150, 200, 0x0000cc);
 
   playerBattlefield: BattlefieldInterface;
   playerHand: HandInterface;
-  //private payerResources: PIXI.Container = this.addContainer(650, 500, 150, 100, 0xaa0000);
+  playerResources: ResourcesInterface;
   playerActions: ActionInterface;
   private playerSupports: PIXI.Container = this.addContainer(0, 300, 150, 200, 0xdd0000);
   playerCharacters: CharactersInterface;
@@ -34,6 +34,13 @@ class GameInterface extends PIXI.Container {
 
   setupGame(playerCharacters: Array<CharacterView>, playerBattlefield: CardView,
             opponentCharacters: Array<CharacterView>, opponentBattlefield: CardView) {
+    this.playerResources = new ResourcesInterface();
+    this.playerResources.x = 0;
+    this.playerResources.y = 300;
+    this.playerResources.width = 150;
+    this.playerResources.height = 50;
+    this.addChild(this.playerResources);
+
     this.playerCharacters = new CharactersInterface(playerCharacters);
     this.playerCharacters.x = 150;
     this.playerCharacters.y = 300;
@@ -61,6 +68,13 @@ class GameInterface extends PIXI.Container {
     this.playerActions.width = 150;
     this.playerActions.height = 100;
     this.addChild(this.playerActions);
+
+    this.opponentResources = new ResourcesInterface();
+    this.opponentResources.x = 0;
+    this.opponentResources.y = 250;
+    this.opponentResources.width = 150;
+    this.opponentResources.height = 50;
+    this.addChild(this.opponentResources);
 
     this.opponentCharacters = new CharactersInterface(opponentCharacters);
     this.opponentCharacters.x = 150;

@@ -98,6 +98,18 @@ class MulliganOpponentView implements EffectView {
     }
   }
 }
+class ResourceAddedView implements EffectView {
+  player: boolean;
+  amount: number;
+
+  updateInterface(game: Game) {
+    if (this.player) {
+      game.view.playerResources.addResources(this.amount);
+    } else {
+      game.view.opponentResources.addResources(this.amount);
+    }
+  }
+}
 class TossView implements EffectView {
   dices: Array<DiceRollView>;
   total: number;
