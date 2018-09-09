@@ -160,23 +160,24 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
           actions :+= ActionRequired(battlefieldOwner.opponent, ActionType.AddShields)
         } else {
           phase = GamePhase.Action
+          currentPlayer = battlefieldOwner
           actions :+= ActionRequired(battlefieldOwner, ActionType.Action)
         }
       case GamePhase.Action => {
         val bothPlayersPass = gameHistory.currentRoundActions
           .takeRight(2)
-          .forall(event => event.action.isInstanceOf[PassAction])
+          .count(_.action.isInstanceOf[PassAction]) == 2
         if (bothPlayersPass) {
           phase = GamePhase.Upkeep
           upkeepPhase()
         } else {
-          // end of the turn
           if (opponentArea.battlefieldClaimed) {
             val automaticPassAction = PassAction()
             handleAction(player.opponent, automaticPassAction)
           } else {
             currentPlayer = currentPlayer.opponent
           }
+          actions :+= ActionRequired(currentPlayer, ActionType.Action)
         }
       }
       case _ =>

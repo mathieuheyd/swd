@@ -170,7 +170,9 @@ case class PassAction() extends GameAction {
     true
   }
   override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
-    HistoryEvent(player, this, Seq.empty)
+    val event = HistoryEvent(player, this, Seq.empty)
+    history.currentRoundActions += event
+    event
   }
 }
 
@@ -193,7 +195,9 @@ case class ActivateAction(card: Int) extends GameAction {
       effects +=  DiceInPoolEffect(dice.uniqueId, dice.sideId)
     })
 
-    HistoryEvent(player, this, effects)
+    val event = HistoryEvent(player, this, effects)
+    history.currentRoundActions += event
+    event
   }
 }
 
@@ -329,7 +333,9 @@ case class ClaimBattlefield() extends GameAction {
   override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
     val battlefield = Seq(playerArea.battlefield, opponentArea.battlefield).flatten.head
     playerArea.battlefield = Some(battlefield)
-    HistoryEvent(player, this, Seq(BattlefieldClaimedEffect()))
+    val event = HistoryEvent(player, this, Seq(BattlefieldClaimedEffect()))
+    history.currentRoundActions += event
+    event
   }
 }
 
