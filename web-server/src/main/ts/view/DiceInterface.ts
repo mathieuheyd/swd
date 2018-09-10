@@ -25,6 +25,10 @@ class DiceInterface extends PIXI.Container {
     mask.endFill();
     this.addChild(mask);
 
+    let diceFace = new PIXI.Container();
+    diceFace.mask = mask;
+    this.addChild(diceFace);
+
     let set: string = (this.dice.card.set.toString() as any).padStart(2, '0');
     let id: string = (this.dice.card.id.toString() as any).padStart(3, '0');
     let url: string = '/cards/en/' + set + '/' + set + id + '.jpg';
@@ -33,8 +37,24 @@ class DiceInterface extends PIXI.Container {
     card.height = 170;
     card.x = -40;
     card.y = -30;
-    this.addChild(card);
-    card.mask = mask;
+    diceFace.addChild(card);
+
+    let symbolBackground: PIXI.Graphics = new PIXI.Graphics();
+    symbolBackground.beginFill(0x000000);
+    symbolBackground.moveTo(50, -8);
+    symbolBackground.lineTo(30, 12);
+    symbolBackground.lineTo(30, 38);
+    symbolBackground.lineTo(50, 58);
+    symbolBackground.moveTo(50, -8);
+    symbolBackground.endFill();
+    diceFace.addChild(symbolBackground);
+
+    let symbol: PIXI.Sprite = PIXI.Sprite.fromImage("dice/indirect.png");
+    symbol.x = 32;
+    symbol.y = 20;
+    symbol.width = 10;
+    symbol.height = 10;
+    diceFace.addChild(symbol);
   }
 
 }
