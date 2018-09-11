@@ -19,7 +19,9 @@ class Application {
   }
 }
 
-// For testing purposes, automatically launch a game
-let userName = new URL(window.location.href).searchParams.get("user");
-let app = new Application(userName);
-app.findGame();
+function startApp() {
+  // For testing purposes, automatically launch a game
+  let userName = new URL(window.location.href).searchParams.get("user");
+  let app = new Application(userName);
+  app.findGame();
+}

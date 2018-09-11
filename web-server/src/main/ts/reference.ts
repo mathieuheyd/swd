@@ -17,3 +17,6 @@
 /// <reference path="view/ResourcesInterface.ts" />
 
 /// <reference path="pixi.js.d.ts" />
+
+
+/// <reference path="TestInterface.ts" />
