@@ -13,10 +13,18 @@ class DiceInterface extends PIXI.Container {
   }
 
   updateDisplay() {
-    let background: PIXI.Sprite = new PIXI.Sprite(PIXI.Texture.WHITE);
-    background.tint = 0x0000FF;
-    background.width = 50;
-    background.height = 50;
+    let background: PIXI.Graphics = new PIXI.Graphics();
+    background.beginFill(0x0000FF);
+    background.moveTo(0, 3);
+    background.lineTo(0, 47);
+    background.lineTo(3, 50);
+    background.lineTo(47, 50);
+    background.lineTo(50, 47);
+    background.lineTo(50, 3);
+    background.lineTo(47, 0);
+    background.lineTo(3, 0);
+    background.lineTo(0, 3);
+    background.endFill();
     this.addChild(background);
 
     let mask: PIXI.Graphics = new PIXI.Graphics();
@@ -70,6 +78,18 @@ class DiceInterface extends PIXI.Container {
     resourceBackground.lineTo(21, 39);
     resourceBackground.endFill();
     diceFace.addChild(resourceBackground);
+
+    let resourceAmount: PIXI.Text = new PIXI.Text('2', {fontSize: 5});
+    resourceAmount.x = 21;
+    resourceAmount.y = 42;
+    diceFace.addChild(resourceAmount);
+
+    let resourceSymbol: PIXI.Sprite = PIXI.Sprite.fromImage("dice/resource.png");
+    resourceSymbol.x = 24;
+    resourceSymbol.y = 40;
+    resourceSymbol.width = 6;
+    resourceSymbol.height = 6;
+    diceFace.addChild(resourceSymbol);
   }
 
 }

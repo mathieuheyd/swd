@@ -15,6 +15,8 @@ class TestApplication {
     let dice = new DiceInterface(d);
     dice.x = 100;
     dice.y = 100;
+    dice.width = 100;
+    dice.height = 100;
     this.view.stage.addChild(dice);
   }
 }
