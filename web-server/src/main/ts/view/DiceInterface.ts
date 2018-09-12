@@ -50,12 +50,15 @@ class DiceInterface extends PIXI.Container {
     symbolBackground.endFill();
     diceFace.addChild(symbolBackground);
 
-    let symbol: PIXI.Sprite = PIXI.Sprite.fromImage("dice/indirect.png");
-    symbol.x = 32;
-    symbol.y = 20;
-    symbol.width = 10;
-    symbol.height = 10;
+    let symbol: PIXI.Sprite = PIXI.Sprite.fromImage("dice/special.png");
+    symbol.x = 30;
+    symbol.y = 17;
+    symbol.width = 15;
+    symbol.height = 15;
     diceFace.addChild(symbol);
+    let filter = new PIXI.filters.ColorMatrixFilter();
+    filter.negative(false);
+    symbol.filters = [filter];
 
     let resourceBackground: PIXI.Graphics = new PIXI.Graphics();
     resourceBackground.lineStyle(1, 0xFFFFFF);
