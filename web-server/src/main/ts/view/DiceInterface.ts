@@ -33,19 +33,20 @@ class DiceInterface extends PIXI.Container {
     let id: string = (this.dice.card.id.toString() as any).padStart(3, '0');
     let url: string = '/cards/en/' + set + '/' + set + id + '.jpg';
     let card: PIXI.Sprite = PIXI.Sprite.fromImage(url);
-    card.width = 120;
-    card.height = 170;
-    card.x = -40;
-    card.y = -30;
+    card.width = 70;
+    card.height = 100;
+    card.x = -20;
+    card.y = -10;
     diceFace.addChild(card);
 
     let symbolBackground: PIXI.Graphics = new PIXI.Graphics();
+    symbolBackground.lineStyle(1, 0xFFFFFF);
     symbolBackground.beginFill(0x000000);
     symbolBackground.moveTo(50, -8);
     symbolBackground.lineTo(30, 12);
     symbolBackground.lineTo(30, 38);
     symbolBackground.lineTo(50, 58);
-    symbolBackground.moveTo(50, -8);
+    symbolBackground.lineTo(50, -8);
     symbolBackground.endFill();
     diceFace.addChild(symbolBackground);
 
@@ -55,6 +56,17 @@ class DiceInterface extends PIXI.Container {
     symbol.width = 10;
     symbol.height = 10;
     diceFace.addChild(symbol);
+
+    let resourceBackground: PIXI.Graphics = new PIXI.Graphics();
+    resourceBackground.lineStyle(1, 0xFFFFFF);
+    resourceBackground.beginFill(0xf4a442);
+    resourceBackground.moveTo(21, 39);
+    resourceBackground.lineTo(29, 39);
+    resourceBackground.lineTo(49, 59);
+    resourceBackground.lineTo(1, 59);
+    resourceBackground.lineTo(21, 39);
+    resourceBackground.endFill();
+    diceFace.addChild(resourceBackground);
   }
 
 }
