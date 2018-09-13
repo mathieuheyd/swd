@@ -1,15 +1,48 @@
 /// <reference path="../reference.ts" />
 
+enum CardColor {
+  Red,
+  Blue,
+  Yellow,
+  Meutral
+}
+
+enum DiceSymbol {
+  MeleeDamage,
+  RangedDamage,
+  Shield,
+  Resource,
+  Disrupt,
+  Discard,
+  Focus,
+  Special,
+  Blank
+}
+
 class DiceInterface extends PIXI.Container {
 
   dice: DiceView;
 
-  sideId: number = 1;
+  sideId: number;
+
+  cardColor: CardColor;
+  symbol: DiceSymbol;
+  amount: number;
+  modifier: boolean;
 
   constructor(dice: DiceView) {
     super();
     this.dice = dice;
+    this.setSide(1);
     this.updateDisplay();
+  }
+
+  setSide(sideId: number) {
+    this.cardColor = CardColor.Blue;
+    this.sideId = sideId;
+    this.symbol = DiceSymbol.Special;
+    this.amount = 1;
+    this.modifier = false;
   }
 
   updateDisplay() {
@@ -58,15 +91,34 @@ class DiceInterface extends PIXI.Container {
     symbolBackground.endFill();
     diceFace.addChild(symbolBackground);
 
-    let symbol: PIXI.Sprite = PIXI.Sprite.fromImage("dice/special.png");
-    symbol.x = 30;
-    symbol.y = 17;
-    symbol.width = 15;
-    symbol.height = 15;
-    diceFace.addChild(symbol);
-    let filter = new PIXI.filters.ColorMatrixFilter();
-    filter.negative(false);
-    symbol.filters = [filter];
+    let negativeFilter = new PIXI.filters.ColorMatrixFilter();
+    negativeFilter.negative(false);
+
+    if (false) {
+      let symbol: PIXI.Sprite = PIXI.Sprite.fromImage("dice/special.png");
+      symbol.x = 30;
+      symbol.y = 17;
+      symbol.width = 15;
+      symbol.height = 15;
+      diceFace.addChild(symbol);
+      symbol.filters = [negativeFilter];
+    } else {
+      let amount: PIXI.Sprite = PIXI.Sprite.fromImage("dice/2.png");
+      amount.x = 25;
+      amount.y = 8;
+      amount.width = 25;
+      amount.height = 25;
+      diceFace.addChild(amount);
+      amount.filters = [negativeFilter];
+
+      let symbol: PIXI.Sprite = PIXI.Sprite.fromImage("dice/disrupt.png");
+      symbol.x = 30;
+      symbol.y = 24;
+      symbol.width = 15;
+      symbol.height = 15;
+      diceFace.addChild(symbol);
+      symbol.filters = [negativeFilter];
+    }
 
     let resourceBackground: PIXI.Graphics = new PIXI.Graphics();
     resourceBackground.lineStyle(1, 0xFFFFFF);
@@ -79,9 +131,11 @@ class DiceInterface extends PIXI.Container {
     resourceBackground.endFill();
     diceFace.addChild(resourceBackground);
 
-    let resourceAmount: PIXI.Text = new PIXI.Text('2', {fontSize: 5});
-    resourceAmount.x = 21;
-    resourceAmount.y = 42;
+    let resourceAmount: PIXI.Sprite = PIXI.Sprite.fromImage("dice/1.png");
+    resourceAmount.x = 15;
+    resourceAmount.y = 36;
+    resourceAmount.width = 15;
+    resourceAmount.height = 15;
     diceFace.addChild(resourceAmount);
 
     let resourceSymbol: PIXI.Sprite = PIXI.Sprite.fromImage("dice/resource.png");
