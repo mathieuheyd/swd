@@ -29,6 +29,7 @@ class DiceInterface extends PIXI.Container {
   symbol: DiceSymbol;
   amount: number;
   modifier: boolean;
+  cost: number;
 
   constructor(dice: DiceView) {
     super();
@@ -43,6 +44,7 @@ class DiceInterface extends PIXI.Container {
     this.symbol = DiceSymbol.Special;
     this.amount = 1;
     this.modifier = false;
+    this.cost = 0;
   }
 
   updateDisplay() {
@@ -94,7 +96,7 @@ class DiceInterface extends PIXI.Container {
     let negativeFilter = new PIXI.filters.ColorMatrixFilter();
     negativeFilter.negative(false);
 
-    if (false) {
+    if (this.symbol == DiceSymbol.Special) {
       let symbol: PIXI.Sprite = PIXI.Sprite.fromImage("dice/special.png");
       symbol.x = 30;
       symbol.y = 17;
@@ -103,7 +105,7 @@ class DiceInterface extends PIXI.Container {
       diceFace.addChild(symbol);
       symbol.filters = [negativeFilter];
     } else {
-      let amount: PIXI.Sprite = PIXI.Sprite.fromImage("dice/2.png");
+      let amount: PIXI.Sprite = PIXI.Sprite.fromImage("dice/" + this.amount + ".png");
       amount.x = 25;
       amount.y = 8;
       amount.width = 25;
@@ -120,30 +122,32 @@ class DiceInterface extends PIXI.Container {
       symbol.filters = [negativeFilter];
     }
 
-    let resourceBackground: PIXI.Graphics = new PIXI.Graphics();
-    resourceBackground.lineStyle(1, 0xFFFFFF);
-    resourceBackground.beginFill(0xf4a442);
-    resourceBackground.moveTo(21, 39);
-    resourceBackground.lineTo(29, 39);
-    resourceBackground.lineTo(49, 59);
-    resourceBackground.lineTo(1, 59);
-    resourceBackground.lineTo(21, 39);
-    resourceBackground.endFill();
-    diceFace.addChild(resourceBackground);
+    if (this.cost > 0) {
+      let resourceBackground: PIXI.Graphics = new PIXI.Graphics();
+      resourceBackground.lineStyle(1, 0xFFFFFF);
+      resourceBackground.beginFill(0xf4a442);
+      resourceBackground.moveTo(21, 39);
+      resourceBackground.lineTo(29, 39);
+      resourceBackground.lineTo(49, 59);
+      resourceBackground.lineTo(1, 59);
+      resourceBackground.lineTo(21, 39);
+      resourceBackground.endFill();
+      diceFace.addChild(resourceBackground);
 
-    let resourceAmount: PIXI.Sprite = PIXI.Sprite.fromImage("dice/1.png");
-    resourceAmount.x = 15;
-    resourceAmount.y = 36;
-    resourceAmount.width = 15;
-    resourceAmount.height = 15;
-    diceFace.addChild(resourceAmount);
+      let resourceAmount: PIXI.Sprite = PIXI.Sprite.fromImage("dice/" + this.cost + ".png");
+      resourceAmount.x = 15;
+      resourceAmount.y = 36;
+      resourceAmount.width = 15;
+      resourceAmount.height = 15;
+      diceFace.addChild(resourceAmount);
 
-    let resourceSymbol: PIXI.Sprite = PIXI.Sprite.fromImage("dice/resource.png");
-    resourceSymbol.x = 24;
-    resourceSymbol.y = 40;
-    resourceSymbol.width = 6;
-    resourceSymbol.height = 6;
-    diceFace.addChild(resourceSymbol);
+      let resourceSymbol: PIXI.Sprite = PIXI.Sprite.fromImage("dice/resource.png");
+      resourceSymbol.x = 24;
+      resourceSymbol.y = 40;
+      resourceSymbol.width = 6;
+      resourceSymbol.height = 6;
+      diceFace.addChild(resourceSymbol);
+    }
   }
 
 }
