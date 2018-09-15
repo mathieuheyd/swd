@@ -6,32 +6,18 @@ class CharacterInterface extends PIXI.Container {
 
   upgrades: Array<CardInterface> = [];
 
-  //dices: Array<DiceInterface>;
+  dices: Array<DiceInterface>;
 
   activated: boolean = false;
 
-  damageAndShieldsInterface: PIXI.Container;
   damages: number = 0;
+
   shields: number = 0;
 
   constructor(character: CharacterView) {
     super();
 
     this.character = new CardInterface(character);
-
-    /*
-    let upgradesInterface = new PIXI.Sprite(PIXI.Texture.EMPTY);
-    upgradesInterface.width = 210;
-    upgradesInterface.height = 100;
-    upgradesInterface.y = 100;
-    this.addChild(upgradesInterface);
-    */
-
-    /*
-    this.damageAndShieldsInterface = new PIXI.Container();
-    this.damageAndShieldsInterface.x = 100;
-    this.addChild(this.damageAndShieldsInterface);
-    */
 
     this.updateDisplay();
   }
@@ -68,7 +54,7 @@ class CharacterInterface extends PIXI.Container {
     this.removeChildren();
 
     let background = new PIXI.Sprite(PIXI.Texture.EMPTY);
-    background.width = 600;
+    background.width = 720;
     background.height = 500;
     this.addChild(background);
 
@@ -85,17 +71,6 @@ class CharacterInterface extends PIXI.Container {
     this.character.width = 300;
     this.character.height = 420;
     this.addChild(this.character);
-
-/*
-    this.damageAndShieldsInterface.removeChildren();
-
-    let shieldsInterface = new PIXI.Text('S: ' + this.shields);
-    this.damageAndShieldsInterface.addChild(shieldsInterface);
-
-    let damagesInterface = new PIXI.Text('D: ' + this.damages);
-    damagesInterface.y = 30;
-    this.damageAndShieldsInterface.addChild(damagesInterface);
-*/
   }
 
 }

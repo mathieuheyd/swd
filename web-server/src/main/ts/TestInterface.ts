@@ -24,7 +24,7 @@ class TestApplication {
     let character = new CharacterInterface(c);
     character.x = 100;
     character.y = 300;
-    character.width = 300;
+    character.width = 360;
     character.height = 250;
     this.view.stage.addChild(character);
 
@@ -35,6 +35,8 @@ class TestApplication {
     let upgrade2 = new CardView();
     upgrade2.card = { set: 1, id: 8};
     character.addUpgrade(upgrade2);
+
+    character.activateCharacter();
   }
 }
 
