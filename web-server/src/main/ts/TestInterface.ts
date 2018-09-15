@@ -8,10 +8,7 @@ class TestApplication {
     document.body.appendChild(this.view.view);
 
     let d = new DiceView();
-    let cardId = new CardId();
-    cardId.set = 1;
-    cardId.id = 1;
-    d.card = cardId;
+    d.card = { set: 1, id: 1};
     let dice = new DiceInterface(d);
     dice.x = 100;
     dice.y = 100;
@@ -20,7 +17,7 @@ class TestApplication {
     this.view.stage.addChild(dice);
 
     let c = new CharacterView();
-    c.card = cardId;
+    c.card = { set: 1, id: 1};
     let character = new CharacterInterface(c);
     character.x = 100;
     character.y = 300;
@@ -36,7 +33,19 @@ class TestApplication {
     upgrade2.card = { set: 1, id: 8};
     character.addUpgrade(upgrade2);
 
-    character.activateCharacter();
+    let diceCharacter = new DiceView();
+    diceCharacter.card = { set: 1, id: 1};
+    character.addDice(diceCharacter);
+
+    let diceUpgrade = new DiceView();
+    diceUpgrade.card = { set: 1, id: 7};
+    character.addDice(diceUpgrade);
+
+    let diceUpgrade2 = new DiceView();
+    diceUpgrade2.card = { set: 1, id: 8};
+    character.addDice(diceUpgrade2);
+
+    //character.activateCharacter();
   }
 }
 

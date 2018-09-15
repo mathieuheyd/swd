@@ -6,7 +6,7 @@ class CharacterInterface extends PIXI.Container {
 
   upgrades: Array<CardInterface> = [];
 
-  dices: Array<DiceInterface>;
+  dices: Array<DiceInterface> = [];
 
   activated: boolean = false;
 
@@ -19,6 +19,12 @@ class CharacterInterface extends PIXI.Container {
 
     this.character = new CardInterface(character);
 
+    this.updateDisplay();
+  }
+
+  addDice(dice: DiceView) {
+    let diceInterface = new DiceInterface(dice);
+    this.dices.push(diceInterface);
     this.updateDisplay();
   }
 
@@ -71,6 +77,15 @@ class CharacterInterface extends PIXI.Container {
     this.character.width = 300;
     this.character.height = 420;
     this.addChild(this.character);
+
+    for (let i = 0; i < this.dices.length; i++) {
+      let dice = this.dices[i];
+      dice.width = 100;
+      dice.height = 100;
+      dice.x = 360 + 125 * (i % 2);
+      dice.y = 100 + 125 * Math.floor(i / 2);
+      this.addChild(dice);
+    }
   }
 
 }
