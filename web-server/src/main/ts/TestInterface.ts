@@ -22,7 +22,7 @@ class TestApplication {
     character.x = 100;
     character.y = 300;
     character.width = 360;
-    character.height = 250;
+    character.height = 325;
     this.view.stage.addChild(character);
 
     let upgrade = new CardView();
@@ -34,18 +34,23 @@ class TestApplication {
     character.addUpgrade(upgrade2);
 
     let diceCharacter = new DiceView();
+    diceCharacter.uniqueId = 101;
     diceCharacter.card = { set: 1, id: 1};
     character.addDice(diceCharacter);
 
     let diceUpgrade = new DiceView();
+    diceUpgrade.uniqueId = 107;
     diceUpgrade.card = { set: 1, id: 7};
     character.addDice(diceUpgrade);
 
     let diceUpgrade2 = new DiceView();
+    diceUpgrade2.uniqueId = 108;
     diceUpgrade2.card = { set: 1, id: 8};
     character.addDice(diceUpgrade2);
 
-    //character.activateCharacter();
+    character.activateCharacter();
+    character.putDiceInPool(101);
+    character.putDiceInPool(107);
   }
 }
 

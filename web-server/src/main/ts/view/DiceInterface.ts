@@ -25,6 +25,8 @@ class DiceInterface extends PIXI.Container {
 
   sideId: number;
 
+  inPool: boolean = false;
+
   cardColor: CardColor;
   symbol: DiceSymbol;
   amount: number;
