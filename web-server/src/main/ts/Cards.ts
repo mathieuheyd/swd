@@ -43,19 +43,28 @@ class DiceSide {
 
 class Cards {
 
-  descriptions: Map<CardId, CardDescription>;
+  descriptions: Map<number, CardDescription> = new Map();
 
-  loadCards() {
+  key(id: CardId) {
+    return id.set * 1000 + id.id;
+  }
+
+  get(id: CardId) {
+    this.descriptions.get(this.key(id));
+  }
+
+  loadCards(onLoaded: Function) {
     fetch("/cards")
       .then(function(response) { return response.json(); })
-      .then(function(cards) {
-        this.descriptions = new Map<CardId, CardDescription>();
-        console.log(cards, typeof(cards));
-        for (let card of cards) {
-          this.descriptions.set(card.id, card);
-        }
-        console.log(this.descriptions);
-      });
+      .then((cards) => this.setAll(cards))
+      .then(() => onLoaded());
+  }
+
+  setAll(cards: any) {
+    this.descriptions = new Map<number, CardDescription>();
+    for (let card of cards) {
+      this.descriptions.set(this.key(card.id), card);
+    }
   }
 
 }

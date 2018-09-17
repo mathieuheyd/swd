@@ -58,5 +58,5 @@ function testInterface() {
   new TestApplication();
 
   let cards = new Cards();
-  cards.loadCards();
+  cards.loadCards(function() { console.log(cards.descriptions); });
 }
