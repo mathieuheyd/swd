@@ -1,5 +1,6 @@
 /// <reference path="Application.ts" />
 /// <reference path="BoardState.ts" />
+/// <reference path="Cards.ts" />
 /// <reference path="EventView.ts" />
 /// <reference path="Game.ts" />
 /// <reference path="MatchMaking.ts" />

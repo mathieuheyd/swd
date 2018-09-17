@@ -56,4 +56,7 @@ class TestApplication {
 
 function testInterface() {
   new TestApplication();
+
+  let cards = new Cards();
+  cards.loadCards();
 }

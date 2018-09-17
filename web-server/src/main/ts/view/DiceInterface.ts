@@ -1,24 +1,5 @@
 /// <reference path="../reference.ts" />
 
-enum CardColor {
-  Red,
-  Blue,
-  Yellow,
-  Meutral
-}
-
-enum DiceSymbol {
-  MeleeDamage,
-  RangedDamage,
-  Shield,
-  Resource,
-  Disrupt,
-  Discard,
-  Focus,
-  Special,
-  Blank
-}
-
 class DiceInterface extends PIXI.Container {
 
   dice: DiceView;
