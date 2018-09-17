@@ -3,12 +3,13 @@
 class TestApplication {
   view: PIXI.Application;
 
-  constructor() {
+  constructor(cards: Cards) {
     this.view = new PIXI.Application(1200, 700, {backgroundColor : 0x1099bb});
     document.body.appendChild(this.view.view);
 
-    let d = new DiceView();
+    let d = new DiceFullView();
     d.card = { set: 1, id: 1};
+    d.description = cards.get(d.card);
     let dice = new DiceInterface(d);
     dice.x = 100;
     dice.y = 100;
@@ -33,19 +34,22 @@ class TestApplication {
     upgrade2.card = { set: 1, id: 8};
     character.addUpgrade(upgrade2);
 
-    let diceCharacter = new DiceView();
+    let diceCharacter = new DiceFullView();
     diceCharacter.uniqueId = 101;
     diceCharacter.card = { set: 1, id: 1};
+    diceCharacter.description = cards.get(diceCharacter.card);
     character.addDice(diceCharacter);
 
-    let diceUpgrade = new DiceView();
-    diceUpgrade.uniqueId = 107;
-    diceUpgrade.card = { set: 1, id: 7};
+    let diceUpgrade = new DiceFullView();
+    diceUpgrade.uniqueId = 117;
+    diceUpgrade.card = { set: 1, id: 17};
+    diceUpgrade.description = cards.get(diceUpgrade.card);
     character.addDice(diceUpgrade);
 
-    let diceUpgrade2 = new DiceView();
+    let diceUpgrade2 = new DiceFullView();
     diceUpgrade2.uniqueId = 108;
     diceUpgrade2.card = { set: 1, id: 8};
+    diceUpgrade2.description = cards.get(diceUpgrade2.card);
     character.addDice(diceUpgrade2);
 
     character.activateCharacter();
@@ -55,8 +59,6 @@ class TestApplication {
 }
 
 function testInterface() {
-  new TestApplication();
-
   let cards = new Cards();
-  cards.loadCards(function() { console.log(cards.descriptions); });
+  cards.loadCards(function() { new TestApplication(cards); });
 }

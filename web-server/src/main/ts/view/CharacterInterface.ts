@@ -21,7 +21,7 @@ class CharacterInterface extends PIXI.Container {
     this.updateDisplay();
   }
 
-  addDice(dice: DiceView) {
+  addDice(dice: DiceFullView) {
     let diceInterface = new DiceInterface(dice);
     this.dices.push(diceInterface);
     this.updateDisplay();

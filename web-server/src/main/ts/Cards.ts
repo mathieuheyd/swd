@@ -49,8 +49,8 @@ class Cards {
     return id.set * 1000 + id.id;
   }
 
-  get(id: CardId) {
-    this.descriptions.get(this.key(id));
+  get(id: CardId): CardDescription {
+    return this.descriptions.get(this.key(id));
   }
 
   loadCards(onLoaded: Function) {

@@ -2,19 +2,20 @@
 
 class DiceInterface extends PIXI.Container {
 
-  dice: DiceView;
+  dice: DiceFullView;
 
   sideId: number;
 
   inPool: boolean = false;
 
-  cardColor: CardColor;
+  cardDescription: CardDescription;
+
   symbol: DiceSymbol;
   amount: number;
   modifier: boolean;
   cost: number;
 
-  constructor(dice: DiceView) {
+  constructor(dice: DiceFullView) {
     super();
     this.dice = dice;
     this.setSide(1);
@@ -22,7 +23,6 @@ class DiceInterface extends PIXI.Container {
   }
 
   setSide(sideId: number) {
-    this.cardColor = CardColor.Blue;
     this.sideId = sideId;
     this.symbol = DiceSymbol.Special;
     this.amount = 1;
@@ -31,8 +31,24 @@ class DiceInterface extends PIXI.Container {
   }
 
   updateDisplay() {
+    let diceColor: number;
+    switch (this.dice.description.color) {
+      case CardColor.Red:
+        diceColor = 0xFF0000;
+        break;
+      case CardColor.Blue:
+        diceColor = 0x0000FF;
+        break;
+      case CardColor.Yellow:
+        diceColor = 0x00FFFF;
+        break;
+      case CardColor.Gray:
+        diceColor = 0x999999;
+        break;
+    }
+
     let background: PIXI.Graphics = new PIXI.Graphics();
-    background.beginFill(0x0000FF);
+    background.beginFill(diceColor);
     background.moveTo(0, 3);
     background.lineTo(0, 47);
     background.lineTo(3, 50);

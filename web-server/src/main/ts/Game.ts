@@ -189,3 +189,9 @@ class DiceRollView {
   dice: DiceView;
   side: number;
 }
+
+class DiceFullView {
+  uniqueId: number;
+  card: CardId;
+  description: CardDescription;
+}
