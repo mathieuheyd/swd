@@ -76,7 +76,7 @@ class DiceInterface extends PIXI.Container {
 
     let set: string = (this.dice.card.set.toString() as any).padStart(2, '0');
     let id: string = (this.dice.card.id.toString() as any).padStart(3, '0');
-    let url: string = '/cards/en/' + set + '/' + set + id + '.jpg';
+    let url: string = '/card/en/' + set + '/' + set + id + '.jpg';
     let card: PIXI.Sprite = PIXI.Sprite.fromImage(url);
     card.width = 70;
     card.height = 100;

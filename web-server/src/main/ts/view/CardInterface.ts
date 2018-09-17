@@ -22,7 +22,7 @@ class CardInterface extends PIXI.Container {
   cardSprite(cardSet: number, cardId : number, horizontal: boolean, exhausted: boolean) {
     let set: string = (cardSet.toString() as any).padStart(2, '0');
     let id: string = (cardId.toString() as any).padStart(3, '0');
-    let url: string = '/cards/en/' + set + '/' + set + id + '.jpg';
+    let url: string = '/card/en/' + set + '/' + set + id + '.jpg';
     let sprite: PIXI.Sprite = PIXI.Sprite.fromImage(url);
     if (horizontal) {
       sprite.width = 100;

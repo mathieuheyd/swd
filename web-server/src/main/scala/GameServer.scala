@@ -74,10 +74,18 @@ object GameServer {
         }
 
       } ~
+      path("cards") {
+        get {
+          complete(HttpResponse(
+            StatusCodes.OK,
+            entity = HttpEntity(MediaTypes.`application/json`, CardsController.getAllCardsDescription().nospaces)
+          ))
+        }
+      } ~
       pathPrefix("client") {
         getFromResourceDirectory("client")
       } ~
-      pathPrefix("cards") {
+      pathPrefix("card") {
         path(Remaining) { remaining =>
           get {
             val url = new URL("http://swdestinydb.com/bundles/cards/" + remaining)
