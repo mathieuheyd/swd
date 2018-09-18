@@ -42,16 +42,16 @@ class DiceInterface extends PIXI.Container {
     let diceColor: number;
     switch (this.dice.description.color) {
       case CardColor.Red:
-        diceColor = 0xFF0000;
+        diceColor = 0xe45031;
         break;
       case CardColor.Blue:
-        diceColor = 0x0000FF;
+        diceColor = 0x5566b3;
         break;
       case CardColor.Yellow:
-        diceColor = 0x00FFFF;
+        diceColor = 0xffc12d;
         break;
       case CardColor.Gray:
-        diceColor = 0x999999;
+        diceColor = 0x97948c;
         break;
     }
 
