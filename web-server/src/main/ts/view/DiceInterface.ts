@@ -160,6 +160,18 @@ class DiceInterface extends PIXI.Container {
       diceFace.addChild(amount);
       amount.filters = [negativeFilter];
 
+      if (diceSide.modifier) {
+        amount.x = 28;
+
+        let modifier: PIXI.Sprite = PIXI.Sprite.fromImage("dice/8.png");
+        modifier.x = 22;
+        modifier.y = 8;
+        modifier.width = 25;
+        modifier.height = 25;
+        diceFace.addChild(modifier);
+        modifier.filters = [negativeFilter];
+      }
+
       let symbol: PIXI.Sprite = PIXI.Sprite.fromImage("dice/" + symbolImage + ".png");
       symbol.x = 30;
       symbol.y = 24;
