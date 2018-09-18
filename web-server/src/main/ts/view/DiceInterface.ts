@@ -17,6 +17,7 @@ class DiceInterface extends PIXI.Container {
 
   setSide(sideId: number) {
     this.sideId = sideId;
+    this.updateDisplay();
   }
 
   getSide(): DiceSide {
@@ -91,9 +92,15 @@ class DiceInterface extends PIXI.Container {
 
    let diceSide = this.getSide();
 
+    let symbolBgColor = 0x000000;
+    if (diceSide.symbol == DiceSymbol.Blank) {
+      symbolBgColor = 0xe52c29;
+    } else if (diceSide.modifier) {
+      symbolBgColor = 0x0e5ca9;
+    }
     let symbolBackground: PIXI.Graphics = new PIXI.Graphics();
     symbolBackground.lineStyle(1, 0xFFFFFF);
-    symbolBackground.beginFill(0x000000);
+    symbolBackground.beginFill(symbolBgColor);
     symbolBackground.moveTo(50, -8);
     symbolBackground.lineTo(30, 12);
     symbolBackground.lineTo(30, 38);

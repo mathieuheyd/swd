@@ -27,7 +27,7 @@ class TestApplication {
     this.view.stage.addChild(character);
 
     let upgrade = new CardView();
-    upgrade.card = { set: 1, id: 7};
+    upgrade.card = { set: 1, id: 17};
     character.addUpgrade(upgrade);
 
     let upgrade2 = new CardView();
@@ -54,7 +54,10 @@ class TestApplication {
 
     character.activateCharacter();
     character.putDiceInPool(101);
-    character.putDiceInPool(107);
+    character.putDiceInPool(117);
+    for (let dice of character.dices) {
+      dice.setSide(2);
+    }
   }
 }
 
