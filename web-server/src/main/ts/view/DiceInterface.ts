@@ -8,13 +8,6 @@ class DiceInterface extends PIXI.Container {
 
   inPool: boolean = false;
 
-  cardDescription: CardDescription;
-
-  symbol: DiceSymbol;
-  amount: number;
-  modifier: boolean;
-  cost: number;
-
   constructor(dice: DiceFullView) {
     super();
     this.dice = dice;
@@ -24,10 +17,25 @@ class DiceInterface extends PIXI.Container {
 
   setSide(sideId: number) {
     this.sideId = sideId;
-    this.symbol = DiceSymbol.Special;
-    this.amount = 1;
-    this.modifier = false;
-    this.cost = 0;
+  }
+
+  getSide(): DiceSide {
+    let diceDescription = this.dice.description.dice;
+    switch (this.sideId) {
+      case 1:
+        return diceDescription.side1;
+      case 2:
+        return diceDescription.side2;
+      case 3:
+        return diceDescription.side3;
+      case 4:
+        return diceDescription.side4;
+      case 5:
+        return diceDescription.side5;
+      case 6:
+        return diceDescription.side6;
+    }
+    return null;
   }
 
   updateDisplay() {
@@ -81,6 +89,8 @@ class DiceInterface extends PIXI.Container {
     card.y = -10;
     diceFace.addChild(card);
 
+   let diceSide = this.getSide();
+
     let symbolBackground: PIXI.Graphics = new PIXI.Graphics();
     symbolBackground.lineStyle(1, 0xFFFFFF);
     symbolBackground.beginFill(0x000000);
@@ -92,11 +102,42 @@ class DiceInterface extends PIXI.Container {
     symbolBackground.endFill();
     diceFace.addChild(symbolBackground);
 
+    let symbolImage: string;
+    switch (diceSide.symbol) {
+      case DiceSymbol.MeleeDamage:
+        symbolImage = "melee";
+        break;
+      case DiceSymbol.RangedDamage:
+        symbolImage = "ranged";
+        break;
+      case DiceSymbol.Shield:
+        symbolImage = "shield";
+        break;
+      case DiceSymbol.Resource:
+        symbolImage = "resource";
+        break;
+      case DiceSymbol.Disrupt:
+        symbolImage = "disrupt";
+        break;
+      case DiceSymbol.Discard:
+        symbolImage = "discard";
+        break;
+      case DiceSymbol.Focus:
+        symbolImage = "focus";
+        break;
+      case DiceSymbol.Special:
+        symbolImage = "special";
+        break;
+      case DiceSymbol.Blank:
+        symbolImage = "blank";
+        break;
+    }
+
     let negativeFilter = new PIXI.filters.ColorMatrixFilter();
     negativeFilter.negative(false);
 
-    if (this.symbol == DiceSymbol.Special) {
-      let symbol: PIXI.Sprite = PIXI.Sprite.fromImage("dice/special.png");
+    if (diceSide.symbol == DiceSymbol.Special || diceSide.symbol == DiceSymbol.Blank) {
+      let symbol: PIXI.Sprite = PIXI.Sprite.fromImage("dice/" + symbolImage + ".png");
       symbol.x = 30;
       symbol.y = 17;
       symbol.width = 15;
@@ -104,7 +145,7 @@ class DiceInterface extends PIXI.Container {
       diceFace.addChild(symbol);
       symbol.filters = [negativeFilter];
     } else {
-      let amount: PIXI.Sprite = PIXI.Sprite.fromImage("dice/" + this.amount + ".png");
+      let amount: PIXI.Sprite = PIXI.Sprite.fromImage("dice/" + diceSide.value + ".png");
       amount.x = 25;
       amount.y = 8;
       amount.width = 25;
@@ -112,7 +153,7 @@ class DiceInterface extends PIXI.Container {
       diceFace.addChild(amount);
       amount.filters = [negativeFilter];
 
-      let symbol: PIXI.Sprite = PIXI.Sprite.fromImage("dice/disrupt.png");
+      let symbol: PIXI.Sprite = PIXI.Sprite.fromImage("dice/" + symbolImage + ".png");
       symbol.x = 30;
       symbol.y = 24;
       symbol.width = 15;
@@ -121,7 +162,7 @@ class DiceInterface extends PIXI.Container {
       symbol.filters = [negativeFilter];
     }
 
-    if (this.cost > 0) {
+    if (diceSide.cost > 0) {
       let resourceBackground: PIXI.Graphics = new PIXI.Graphics();
       resourceBackground.lineStyle(1, 0xFFFFFF);
       resourceBackground.beginFill(0xf4a442);
@@ -133,7 +174,7 @@ class DiceInterface extends PIXI.Container {
       resourceBackground.endFill();
       diceFace.addChild(resourceBackground);
 
-      let resourceAmount: PIXI.Sprite = PIXI.Sprite.fromImage("dice/" + this.cost + ".png");
+      let resourceAmount: PIXI.Sprite = PIXI.Sprite.fromImage("dice/" + diceSide.cost + ".png");
       resourceAmount.x = 15;
       resourceAmount.y = 36;
       resourceAmount.width = 15;
