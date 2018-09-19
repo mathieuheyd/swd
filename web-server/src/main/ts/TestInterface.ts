@@ -44,6 +44,7 @@ class TestApplication {
 
     character.activateCharacter();
     character.damages = 11;
+    character.shields = 3;
     character.putDiceInPool(101);
     character.putDiceInPool(117);
     for (let dice of character.dices) {
