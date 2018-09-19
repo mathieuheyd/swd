@@ -163,9 +163,9 @@ class DiceInterface extends PIXI.Container {
       if (diceSide.modifier) {
         amount.x = 28;
 
-        let modifier: PIXI.Sprite = PIXI.Sprite.fromImage("dice/8.png");
+        let modifier: PIXI.Sprite = PIXI.Sprite.fromImage("dice/plus.png");
         modifier.x = 22;
-        modifier.y = 8;
+        modifier.y = 7;
         modifier.width = 25;
         modifier.height = 25;
         diceFace.addChild(modifier);

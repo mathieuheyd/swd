@@ -7,16 +7,6 @@ class TestApplication {
     this.view = new PIXI.Application(1200, 700, {backgroundColor : 0x1099bb});
     document.body.appendChild(this.view.view);
 
-    let d = new DiceFullView();
-    d.card = { set: 1, id: 1};
-    d.description = cards.get(d.card);
-    let dice = new DiceInterface(d);
-    dice.x = 100;
-    dice.y = 100;
-    dice.width = 100;
-    dice.height = 100;
-    this.view.stage.addChild(dice);
-
     let c = new CharacterView();
     c.card = { set: 1, id: 1};
     let character = new CharacterInterface(c);
@@ -56,7 +46,7 @@ class TestApplication {
     character.putDiceInPool(101);
     character.putDiceInPool(117);
     for (let dice of character.dices) {
-      dice.setSide(2);
+      dice.setSide(3);
     }
   }
 }
