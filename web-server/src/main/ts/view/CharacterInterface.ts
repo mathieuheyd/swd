@@ -89,6 +89,25 @@ class CharacterInterface extends PIXI.Container {
     }
     this.addChild(this.character);
 
+    let damage1 = this.damages % 3;
+    let damage3 = (this.damages - damage1) / 3;
+    for (let i = 0; i < damage3; i++) {
+      let image: PIXI.Sprite = PIXI.Sprite.fromImage("damage_3.png");
+      image.x = 425 + i * 50;
+      image.y = 550;
+      image.width = 100;
+      image.height = 100;
+      this.addChild(image);
+    }
+    for (let i = 0; i < damage1; i++) {
+      let image: PIXI.Sprite = PIXI.Sprite.fromImage("damage_1.png");
+      image.x = 425 + damage3 * 50 + i * 50;
+      image.y = 550;
+      image.width = 100;
+      image.height = 100;
+      this.addChild(image);
+    }
+
     for (let i = 0; i < this.dices.length; i++) {
       let dice = this.dices[i];
       dice.width = 100;

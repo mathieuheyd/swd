@@ -43,6 +43,7 @@ class TestApplication {
     character.addDice(diceUpgrade2);
 
     character.activateCharacter();
+    character.damages = 11;
     character.putDiceInPool(101);
     character.putDiceInPool(117);
     for (let dice of character.dices) {
