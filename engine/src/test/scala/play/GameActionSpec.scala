@@ -33,7 +33,7 @@ class GameActionSpec extends FlatSpec {
   "Activate Action" should "not be possible if character is already activated" in {
     val action = ActivateAction(1)
 
-    val character = new InPlayCharacter(1, Awakenings._1, Array.empty)
+    val character = new InPlayCharacter(1, Awakenings._1, Seq.empty)
     character.isActivated = true
     val playerArea = new PlayerArea(Player.Player1, Array(character), new Deck(Seq.empty), None)
 

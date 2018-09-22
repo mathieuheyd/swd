@@ -1,13 +1,17 @@
 package play
 
-import entities.{Battlefield, Card, Character, Dice, DiceSide}
+import entities.{Battlefield, Card, Character, DeckCard, Dice, DiceSide}
 
+import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
-class InPlayCharacter(val uniqueId: Int, val character: Character, val dices: Array[InPlayDice]) {
+class InPlayCharacter(val uniqueId: Int, val character: Character, private val characterDices: Seq[InPlayDice]) {
   var isActivated = false
   var health = character.maxHealth
   var shields = 0
+  var damages = 0
+  val upgrades: ListBuffer[InPlayCard] = ListBuffer.empty
+  val dices: ListBuffer[InPlayDice] = characterDices.to[ListBuffer]
 }
 
 class InPlayDice(val uniqueId: Int, val dice: Dice) {
@@ -32,7 +36,7 @@ class InPlayDice(val uniqueId: Int, val dice: Dice) {
 
 }
 
-case class InPlayCard(uniqueId: Int, card: Card, dice: Option[InPlayDice])
+case class InPlayCard(uniqueId: Int, card: DeckCard, dice: Option[InPlayDice])
 
 class Deck(var cards: Seq[InPlayCard]) {
   def shuffle() = {

@@ -68,7 +68,7 @@ class GameMechanics(val deckPlayer1: FullDeck, val deckPlayer2: FullDeck) {
     val inPlayCharacters = deck.characters.zipWithIndex.map { c =>
       val characterId = id.next
       val firstDice = new InPlayDice(id.next, c._1.character.dice.get)
-      val dices = if (c._1.elite) Array(firstDice, new InPlayDice(id.next, c._1.character.dice.get)) else Array(firstDice)
+      val dices = if (c._1.elite) Seq(firstDice, new InPlayDice(id.next, c._1.character.dice.get)) else Seq(firstDice)
 
       cardIds += (characterId -> c._1.character.id)
       dices.foreach(dice => cardIds += (dice.uniqueId -> c._1.character.id))

@@ -1,6 +1,6 @@
 package play
 
-import entities.DiceSideSymbol
+import entities.{CardType, DeckCard, DiceSideSymbol}
 import play.history._
 
 import scala.collection.mutable
@@ -324,15 +324,66 @@ case class DiscardReroll(card: Int, dice: Int) extends GameAction {
   }
 }
 
-//case class PlayCard(card: Int) extends GameAction {
-//  override def isValid(phase: GamePhase.Value, playerArea: PlayerArea, opponentArea: PlayerArea): Boolean = {
-//    true
-//  }
-//  override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea): Seq[GameEvent] = {
-//    Seq(PassEvent(player))
-//  }
-//}
-//
+case class PlayUpgrade(card: Int, character: Int, replaced: Option[Int]) extends GameAction {
+  override val phase = GamePhase.Action
+  override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
+    val inHandCard = playerArea.hand.find(_.uniqueId == card)
+    val inPlayCharacter = playerArea.characters.find(_.uniqueId == character)
+    val replacedUpgrade = replaced.flatMap(id => inPlayCharacter.flatMap(_.upgrades.find(_.uniqueId == id)))
+    Rule(
+      inHandCard.exists(_.card.cardType == CardType.Upgrade),
+      "Card must be an upgrade card in hand").isValid &&
+    Rule(
+      inPlayCharacter.isDefined,
+      "Targeted character must be valid").isValid &&
+    Rule(
+      replaced.isEmpty || replacedUpgrade.isDefined,
+      "Replaced upgrade must be on character").isValid &&
+    Rule(
+      replaced.isDefined || inPlayCharacter.get.upgrades.size < 3,
+      "Number of upgrades on character must be valid").isValid &&
+    Rule(
+      inHandCard.get.card.cost - replacedUpgrade.map(_.card.cost).getOrElse(0) <= playerArea.resources,
+      "Player should have more or equal resources than the price of the card").isValid
+  }
+  override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
+    val inHandCard = playerArea.hand.find(_.uniqueId == card).get
+    val inPlayCharacter = playerArea.characters.find(_.uniqueId == character).get
+    val replacedUpgrade = replaced.map(upgrade => inPlayCharacter.upgrades.find(_.uniqueId == upgrade).get)
+    val cost = inHandCard.card.cost - replacedUpgrade.map(_.card.cost).getOrElse(0)
+
+    val effects = mutable.Buffer.empty[HistoryEffect]
+
+    replacedUpgrade.foreach { upgradeToRemove =>
+      inPlayCharacter.upgrades -= upgradeToRemove
+      effects += UpgradeDiscardedEffect(upgradeToRemove.uniqueId)
+    }
+
+    inPlayCharacter.upgrades += inHandCard
+    effects += UpgradeAddedEffect(inHandCard.uniqueId, inPlayCharacter.uniqueId)
+
+    inHandCard.dice.foreach { dice =>
+      inPlayCharacter.dices += dice
+      effects += DiceAddedEffect(dice.uniqueId, inPlayCharacter.uniqueId)
+    }
+
+    playerArea.resources -= cost
+    effects += ResourceRemovedEffect(player, cost)
+
+    HistoryEvent(player, this, effects)
+  }
+}
+
+case class PlayCard(card: Int) extends GameAction {
+  override val phase = GamePhase.Action
+  override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
+    true
+  }
+  override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
+    null
+  }
+}
+
 //case class CardAbility(card: Int) extends GameAction {
 //  override def isValid(phase: GamePhase.Value, playerArea: PlayerArea, opponentArea: PlayerArea): Boolean = {
 //    true

@@ -11,6 +11,9 @@ case class BattlefieldChosenEffect(player: Player.Value) extends HistoryEffect
 
 case class CharacterActivatedEffect(uniqueId: Int) extends HistoryEffect
 case class CharacterReadiedEffect(uniqueId: Int) extends HistoryEffect
+case class UpgradeAddedEffect(uniqueId: Int, characterId: Int) extends HistoryEffect
+case class UpgradeDiscardedEffect(uniqueId: Int) extends HistoryEffect
+case class DiceAddedEffect(uniqueId: Int, characterId: Int) extends HistoryEffect
 case class DiceRolledEffect(uniqueId: Int, sideId: Int) extends HistoryEffect
 case class DiceInPoolEffect(uniqueId: Int, sideId: Int) extends HistoryEffect
 case class DiceOutPoolEffect(uniqueId: Int) extends HistoryEffect
