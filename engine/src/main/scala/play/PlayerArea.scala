@@ -65,6 +65,7 @@ class PlayerArea(val player: Player.Value,
 
   var resources = 0
   var hand: Seq[InPlayCard] = Seq.empty
+  val supports: ListBuffer[InPlayCard] = ListBuffer.empty
   var discardPile: Seq[InPlayCard] = Seq.empty
 
   def shuffleDeck() = deck.shuffle()

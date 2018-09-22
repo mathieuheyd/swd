@@ -374,6 +374,37 @@ case class PlayUpgrade(card: Int, character: Int, replaced: Option[Int]) extends
   }
 }
 
+case class PlaySupport(card: Int) extends GameAction {
+  override val phase = GamePhase.Action
+  override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
+    val inHandCard = playerArea.hand.find(_.uniqueId == card)
+    Rule(
+      inHandCard.exists(_.card.cardType == CardType.Support),
+      "Card must be a support card in hand").isValid &&
+    Rule(
+      inHandCard.get.card.cost <= playerArea.resources,
+      "Player should have more or equal resources than the price of the card").isValid
+  }
+  override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
+    val inHandCard = playerArea.hand.find(_.uniqueId == card).get
+    val cost = inHandCard.card.cost
+
+    val effects = mutable.Buffer.empty[HistoryEffect]
+
+    playerArea.supports += inHandCard
+    effects += SupportInPlayEffect(inHandCard.uniqueId)
+
+    inHandCard.dice.foreach { dice =>
+      effects += DiceAddedEffect(dice.uniqueId, inHandCard.uniqueId)
+    }
+
+    playerArea.resources -= cost
+    effects += ResourceRemovedEffect(player, cost)
+
+    HistoryEvent(player, this, effects)
+  }
+}
+
 case class PlayCard(card: Int) extends GameAction {
   override val phase = GamePhase.Action
   override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
