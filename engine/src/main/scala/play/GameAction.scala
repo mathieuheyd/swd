@@ -347,13 +347,13 @@ case class PlayUpgrade(card: Int, character: Int, replaced: Option[Int]) extends
       "Player should have more or equal resources than the price of the card").isValid
   }
   override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
-    val inHandCard = playerArea.hand.find(_.uniqueId == card).get
-    val inPlayCharacter = playerArea.characters.find(_.uniqueId == character).get
-    val replacedUpgrade = replaced.map(upgrade => inPlayCharacter.upgrades.find(_.uniqueId == upgrade).get)
-    val cost = inHandCard.card.cost - replacedUpgrade.map(_.card.cost).getOrElse(0)
-
     val effects = mutable.Buffer.empty[HistoryEffect]
 
+    val inHandCard = playerArea.popCardFromHand(card).get
+    effects += CardDiscardedEffect(inHandCard.uniqueId)
+
+    val inPlayCharacter = playerArea.characters.find(_.uniqueId == character).get
+    val replacedUpgrade = replaced.map(upgrade => inPlayCharacter.upgrades.find(_.uniqueId == upgrade).get)
     replacedUpgrade.foreach { upgradeToRemove =>
       inPlayCharacter.upgrades -= upgradeToRemove
       effects += UpgradeDiscardedEffect(upgradeToRemove.uniqueId)
@@ -367,6 +367,7 @@ case class PlayUpgrade(card: Int, character: Int, replaced: Option[Int]) extends
       effects += DiceAddedEffect(dice.uniqueId, inPlayCharacter.uniqueId)
     }
 
+    val cost = inHandCard.card.cost - replacedUpgrade.map(_.card.cost).getOrElse(0)
     playerArea.resources -= cost
     effects += ResourceRemovedEffect(player, cost)
 
@@ -386,10 +387,10 @@ case class PlaySupport(card: Int) extends GameAction {
       "Player should have more or equal resources than the price of the card").isValid
   }
   override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
-    val inHandCard = playerArea.hand.find(_.uniqueId == card).get
-    val cost = inHandCard.card.cost
-
     val effects = mutable.Buffer.empty[HistoryEffect]
+
+    val inHandCard = playerArea.popCardFromHand(card).get
+    effects += CardDiscardedEffect(inHandCard.uniqueId)
 
     playerArea.supports += inHandCard
     effects += SupportInPlayEffect(inHandCard.uniqueId)
@@ -398,6 +399,7 @@ case class PlaySupport(card: Int) extends GameAction {
       effects += DiceAddedEffect(dice.uniqueId, inHandCard.uniqueId)
     }
 
+    val cost = inHandCard.card.cost
     playerArea.resources -= cost
     effects += ResourceRemovedEffect(player, cost)
 
@@ -405,13 +407,24 @@ case class PlaySupport(card: Int) extends GameAction {
   }
 }
 
-case class PlayCard(card: Int) extends GameAction {
+case class PlayEvent(card: Int) extends GameAction {
   override val phase = GamePhase.Action
   override def isValid(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): Boolean = {
-    true
+    val inHandCard = playerArea.hand.find(_.uniqueId == card)
+    Rule(
+      inHandCard.exists(_.card.cardType == CardType.Event),
+      "Card must be an event card in hand").isValid &&
+    Rule(
+      inHandCard.get.card.cost <= playerArea.resources,
+      "Player should have more or equal resources than the price of the card").isValid
   }
   override def process(player: Player.Value, playerArea: PlayerArea, opponentArea: PlayerArea, history: GameHistory): HistoryEvent = {
-    null
+    val effects = mutable.Buffer.empty[HistoryEffect]
+
+    val inHandCard = playerArea.popCardFromHand(card).get
+    effects += CardDiscardedEffect(inHandCard.uniqueId)
+
+    HistoryEvent(player, this, effects)
   }
 }
 
