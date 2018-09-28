@@ -11,7 +11,7 @@ class TestApplication {
     c.card = { set: 1, id: 1};
     let character = new CharacterInterface(c);
     character.x = 100;
-    character.y = 300;
+    character.y = 325;
     character.width = 360;
     character.height = 325;
     this.view.stage.addChild(character);
@@ -50,6 +50,23 @@ class TestApplication {
     for (let dice of character.dices) {
       dice.setSide(3);
     }
+
+    let opponent = new CharacterInterface(c, true);
+    opponent.x = 100;
+    opponent.y = 0;
+    opponent.width = 360;
+    opponent.height = 325;
+    this.view.stage.addChild(opponent);
+    opponent.addUpgrade(upgrade);
+    opponent.addUpgrade(upgrade2);
+    opponent.addDice(diceCharacter);
+    opponent.addDice(diceUpgrade);
+    opponent.addDice(diceUpgrade2);
+    opponent.activateCharacter();
+    opponent.damages = 11;
+    opponent.shields = 3;
+    opponent.putDiceInPool(101);
+    opponent.putDiceInPool(117);
   }
 }
 

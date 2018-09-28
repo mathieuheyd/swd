@@ -3,6 +3,7 @@
 class CharacterInterface extends PIXI.Container {
 
   character: CardInterface;
+  isOpponent: boolean;
   activated: boolean = false;
 
   upgrades: Array<CardInterface> = [];
@@ -13,10 +14,11 @@ class CharacterInterface extends PIXI.Container {
 
   shields: number = 0;
 
-  constructor(character: CharacterView) {
+  constructor(character: CharacterView, isOpponent: boolean = false) {
     super();
 
     this.character = new CardInterface(character);
+    this.isOpponent = isOpponent;
 
     this.updateDisplay();
   }
@@ -53,12 +55,14 @@ class CharacterInterface extends PIXI.Container {
     this.activated = true;
     this.character.exhausted = true;
     this.character.updateDisplay();
+    this.updateDisplay();
   }
 
   readyCharacter() {
     this.activated = false;
     this.character.exhausted = false;
     this.character.updateDisplay();
+    this.updateDisplay();
   }
 
   updateDisplay() {
@@ -72,18 +76,19 @@ class CharacterInterface extends PIXI.Container {
     for (let i = this.upgrades.length - 1; i >= 0; i--) {
       let upgrade = this.upgrades[i];
       upgrade.x = 300 - (i + 1) * 100;
-      upgrade.y = 230;
+      upgrade.y = this.isOpponent ? 0 : 230;
       upgrade.width = 300;
       upgrade.height = 420;
       this.addChild(upgrade);
     }
 
     this.character.x = 300;
-    this.character.y = 150;
     if (this.activated) {
+      this.character.y = this.isOpponent ? 200 : 150;
       this.character.width = 420;
       this.character.height = 300;
     } else {
+      this.character.y = this.isOpponent ? 80 : 150;
       this.character.width = 300;
       this.character.height = 420;
     }
@@ -94,7 +99,7 @@ class CharacterInterface extends PIXI.Container {
     for (let i = 0; i < damage3; i++) {
       let image: PIXI.Sprite = PIXI.Sprite.fromImage("damage_3.png");
       image.x = 420 + i * 50;
-      image.y = 550;
+      image.y = this.isOpponent ? 0 : 550;
       image.width = 100;
       image.height = 100;
       this.addChild(image);
@@ -102,7 +107,7 @@ class CharacterInterface extends PIXI.Container {
     for (let i = 0; i < damage1; i++) {
       let image: PIXI.Sprite = PIXI.Sprite.fromImage("damage_1.png");
       image.x = 420 + damage3 * 50 + i * 50;
-      image.y = 550;
+      image.y = this.isOpponent ? 0 : 550;
       image.width = 100;
       image.height = 100;
       this.addChild(image);
@@ -111,7 +116,7 @@ class CharacterInterface extends PIXI.Container {
     for (let i = 0; i < this.shields; i++) {
       let image: PIXI.Sprite = PIXI.Sprite.fromImage("full_shield.png");
       image.x = 500 + i * 60;
-      image.y = 450;
+      image.y = this.isOpponent ? 60 : 450;
       image.width = 100;
       image.height = 130;
       this.addChild(image);
@@ -123,7 +128,7 @@ class CharacterInterface extends PIXI.Container {
       dice.height = 100;
       if (dice.inPool) {
         dice.x = 720 - ((i + 1) * 125);
-        dice.y = 25;
+        dice.y = this.isOpponent ? 525 : 25;
       } else {
         dice.x = 360 + 125 * (i % 2);
         dice.y = 250 + 125 * Math.floor(i / 2);
