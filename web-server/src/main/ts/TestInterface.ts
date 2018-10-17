@@ -9,12 +9,14 @@ class TestApplication {
 
     let c = new CharacterView();
     c.card = { set: 1, id: 1};
-    let character = new CharacterInterface(c);
-    character.x = 100;
-    character.y = 325;
-    character.width = 360;
-    character.height = 325;
-    this.view.stage.addChild(character);
+
+    let characters = new CharactersInterface([c], 600 / 300);
+    characters.width = 600;
+    characters.height = 300;
+    this.view.stage.addChild(characters);
+    characters.updateDisplay();
+
+    let character = characters.characterInterfaces[0];
 
     let upgrade = new CardView();
     upgrade.card = { set: 1, id: 17};
@@ -51,6 +53,9 @@ class TestApplication {
       dice.setSide(3);
     }
 
+    characters.updateDisplay();
+
+/*
     let opponent = new CharacterInterface(c, true);
     opponent.x = 100;
     opponent.y = 0;
@@ -67,6 +72,7 @@ class TestApplication {
     opponent.shields = 3;
     opponent.putDiceInPool(101);
     opponent.putDiceInPool(117);
+*/
   }
 }
 

@@ -41,7 +41,7 @@ class GameInterface extends PIXI.Container {
     this.playerResources.height = 50;
     this.addChild(this.playerResources);
 
-    this.playerCharacters = new CharactersInterface(playerCharacters);
+    this.playerCharacters = new CharactersInterface(playerCharacters, 500 / 200);
     this.playerCharacters.x = 150;
     this.playerCharacters.y = 300;
     this.playerCharacters.width = 500;
@@ -76,7 +76,7 @@ class GameInterface extends PIXI.Container {
     this.opponentResources.height = 50;
     this.addChild(this.opponentResources);
 
-    this.opponentCharacters = new CharactersInterface(opponentCharacters);
+    this.opponentCharacters = new CharactersInterface(opponentCharacters, 500 / 200);
     this.opponentCharacters.x = 150;
     this.opponentCharacters.y = 100;
     this.opponentCharacters.width = 500;

@@ -68,21 +68,23 @@ class CharacterInterface extends PIXI.Container {
   updateDisplay() {
     this.removeChildren();
 
+    let widthOffset = 720 - this.realWidth();
+
     let background = new PIXI.Sprite(PIXI.Texture.EMPTY);
-    background.width = 720;
+    background.width = 720 - widthOffset;
     background.height = 650;
     this.addChild(background);
 
     for (let i = this.upgrades.length - 1; i >= 0; i--) {
       let upgrade = this.upgrades[i];
-      upgrade.x = 300 - (i + 1) * 100;
+      upgrade.x = 300 - (i + 1) * 100 - widthOffset;
       upgrade.y = this.isOpponent ? 0 : 230;
       upgrade.width = 300;
       upgrade.height = 420;
       this.addChild(upgrade);
     }
 
-    this.character.x = 300;
+    this.character.x = 300 - widthOffset;
     if (this.activated) {
       this.character.y = this.isOpponent ? 200 : 150;
       this.character.width = 420;
@@ -98,7 +100,7 @@ class CharacterInterface extends PIXI.Container {
     let damage3 = (this.damages - damage1) / 3;
     for (let i = 0; i < damage3; i++) {
       let image: PIXI.Sprite = PIXI.Sprite.fromImage("damage_3.png");
-      image.x = 420 + i * 50;
+      image.x = 420 + i * 50 - widthOffset;
       image.y = this.isOpponent ? 0 : 550;
       image.width = 100;
       image.height = 100;
@@ -106,7 +108,7 @@ class CharacterInterface extends PIXI.Container {
     }
     for (let i = 0; i < damage1; i++) {
       let image: PIXI.Sprite = PIXI.Sprite.fromImage("damage_1.png");
-      image.x = 420 + damage3 * 50 + i * 50;
+      image.x = 420 + damage3 * 50 + i * 50 - widthOffset;
       image.y = this.isOpponent ? 0 : 550;
       image.width = 100;
       image.height = 100;
@@ -115,7 +117,7 @@ class CharacterInterface extends PIXI.Container {
 
     for (let i = 0; i < this.shields; i++) {
       let image: PIXI.Sprite = PIXI.Sprite.fromImage("full_shield.png");
-      image.x = 500 + i * 60;
+      image.x = 500 + i * 60 - widthOffset;
       image.y = this.isOpponent ? 60 : 450;
       image.width = 100;
       image.height = 130;
@@ -127,14 +129,18 @@ class CharacterInterface extends PIXI.Container {
       dice.width = 100;
       dice.height = 100;
       if (dice.inPool) {
-        dice.x = 720 - ((i + 1) * 125);
+        dice.x = 720 - ((i + 1) * 125) - widthOffset;
         dice.y = this.isOpponent ? 525 : 25;
       } else {
-        dice.x = 360 + 125 * (i % 2);
+        dice.x = 360 + 125 * (i % 2) - widthOffset;
         dice.y = 250 + 125 * Math.floor(i / 2);
       }
       this.addChild(dice);
     }
+  }
+
+  realWidth(): number{
+    return 420 + 100 * this.upgrades.length;
   }
 
 }
